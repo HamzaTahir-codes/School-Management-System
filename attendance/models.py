@@ -1,9 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from core.models import TenantModel
 
-
-class TeacherAttendance(TenantModel):
+class TeacherAttendance(models.Model):
     teacher = models.ForeignKey('people.TeacherProfile', on_delete=models.CASCADE)
     date = models.DateField()
     is_present = models.BooleanField(default=True)
@@ -13,14 +11,14 @@ class TeacherAttendance(TenantModel):
         unique_together = ('teacher', 'date')
 
 
-class StudentAttendance(TenantModel):
+class StudentAttendance(models.Model):
     student = models.ForeignKey('people.StudentProfile', on_delete=models.CASCADE)
     date = models.DateField()
     is_present = models.BooleanField(default=True)
     teacher = models.ForeignKey('people.TeacherProfile', on_delete=models.SET_NULL, null=True, blank=True)
 
 
-class LeaveRequest(TenantModel):
+class LeaveRequest(models.Model):
     class Status(models.TextChoices):
         PENDING = 'PENDING', _('Pending')
         APPROVED = 'APPROVED', _('Approved')

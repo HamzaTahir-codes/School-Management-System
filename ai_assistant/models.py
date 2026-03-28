@@ -1,9 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from core.models import TenantModel
 
-
-class AcademicContent(TenantModel):
+class AcademicContent(models.Model):
     """Stores AI-generated content: schedules, outlines, exam papers, activities"""
     class ContentType(models.TextChoices):
         SCHEDULE = 'SCHEDULE', _('Class Schedule')

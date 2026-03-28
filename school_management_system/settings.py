@@ -37,28 +37,42 @@ ALLOWED_HOSTS = ['*']
 
 # Application definition
 
-INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
+# ===================== SHARED_APPS (Public Schema) =====================
+SHARED_APPS = [
+    'django_tenants',
+    'schools',                    # School (Tenant), Domain, SchoolSubscriptionPayment
     'django.contrib.contenttypes',
+]
+
+# ===================== TENANT_APPS (Per-School Schema) =====================
+TENANT_APPS = [
+    'django.contrib.auth',             # Required for per-tenant users
+    'accounts',                   # Your custom User model with roles
+
+    # Admin Per Tenant
+    'django.contrib.admin',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'core',
-    'accounts',
-    'schools',
     'academics',
     'people',
     'attendance',
     'grading',
     'fees',
-    'notifications',
     'ai_assistant',
     'certificates',
+    'notifications',
 ]
 
+INSTALLED_APPS = SHARED_APPS + [app for app in TENANT_APPS if app not in SHARED_APPS]
+
+# 2. Tenant Configuration
+TENANT_MODEL = "schools.School"          # ← Your tenant model
+TENANT_DOMAIN_MODEL = "schools.Domain"   # ← Domain model (for subdomains)
+
 MIDDLEWARE = [
+    'django_tenants.middleware.main.TenantMainMiddleware',  # Must be first
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -93,7 +107,7 @@ WSGI_APPLICATION = 'school_management_system.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django_tenants.postgresql_backend',
         'NAME': env('DATABASE_NAME'),
         'USER': env('DATABASE_USER'),
         'PASSWORD': env('DATABASE_PASSWORD'),
@@ -101,6 +115,9 @@ DATABASES = {
         'PORT': env('DATABASE_PORT'),
     }
 }
+
+DATABASE_ROUTERS = (
+    'django_tenants.routers.TenantSyncRouter',)
 
 
 # Password validation
@@ -144,3 +161,4 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+

@@ -1,9 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from core.models import TenantModel
 
-
-class NotificationLog(TenantModel):
+class NotificationLog(models.Model):
     class Category(models.TextChoices):
         FEE_REMINDER = 'FEE', _('Fee Reminder')
         ATTENDANCE = 'ATTENDANCE', _('Attendance Alert')

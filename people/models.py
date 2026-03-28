@@ -1,9 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from core.models import TenantModel
 
-
-class TeacherProfile(TenantModel):
+class TeacherProfile(models.Model):
     user = models.OneToOneField('accounts.User', on_delete=models.CASCADE, related_name='teacher_profile')
     date_of_birth = models.DateField()
     joining_date = models.DateField()
@@ -13,7 +11,7 @@ class TeacherProfile(TenantModel):
         return f"Teacher: {self.user.get_full_name() or self.user.username}"
 
 
-class ParentProfile(TenantModel):
+class ParentProfile(models.Model):
     user = models.OneToOneField('accounts.User', on_delete=models.CASCADE, related_name='parent_profile')
     address = models.TextField()
     is_fees_blocked = models.BooleanField(default=False)  # Will be updated by fees logic
@@ -22,7 +20,7 @@ class ParentProfile(TenantModel):
         return f"Parent: {self.user.get_full_name() or self.user.username}"
 
 
-class StudentProfile(TenantModel):
+class StudentProfile(models.Model):
     class Status(models.TextChoices):
         ACTIVE = 'ACTIVE', _('Active')
         LEFT = 'LEFT', _('Left School')
@@ -38,7 +36,7 @@ class StudentProfile(TenantModel):
     status = models.CharField(max_length=15, choices=Status.choices, default=Status.ACTIVE)
 
     class Meta:
-        unique_together = ('school', 'roll_number', 'class_level')
+        unique_together = ('roll_number', 'class_level')
 
     def __str__(self):
         return f"{self.user.get_full_name() or self.user.username} - {self.class_level}"

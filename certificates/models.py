@@ -1,9 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from core.models import TenantModel
 
-
-class Certificate(TenantModel):
+class Certificate(models.Model):
     class Type(models.TextChoices):
         LEAVING = 'LEAVING', _('School Leaving Certificate')
         MERIT = 'MERIT', _('Merit Certificate')

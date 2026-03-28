@@ -1,8 +1,6 @@
 from django.db import models
-from core.models import TenantModel
 
-
-class Mark(TenantModel):
+class Mark(models.Model):
     student = models.ForeignKey('people.StudentProfile', on_delete=models.CASCADE)
     subject = models.ForeignKey('academics.Subject', on_delete=models.CASCADE)
     academic_session = models.ForeignKey('academics.AcademicSession', on_delete=models.CASCADE)
@@ -15,7 +13,7 @@ class Mark(TenantModel):
         unique_together = ('student', 'subject', 'academic_session', 'term')
 
 
-class FinalReport(TenantModel):
+class FinalReport(models.Model):
     """AI-aggregated final report for parents"""
     student = models.ForeignKey('people.StudentProfile', on_delete=models.CASCADE)
     academic_session = models.ForeignKey('academics.AcademicSession', on_delete=models.CASCADE)

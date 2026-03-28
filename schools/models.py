@@ -1,35 +1,38 @@
 from django.db import models
 from django.utils import timezone
 from datetime import timedelta
+from django_tenants.models import TenantMixin, DomainMixin
 
-
-class School(models.Model):
-    """School / Tenant - Main entity for multi-tenancy"""
+class School(TenantMixin):
+    """Main Tenant Model - Each school gets its own PostgreSQL schema"""
     name = models.CharField(max_length=255)
-    slug = models.SlugField(unique=True, help_text="Unique identifier for the school")
+    slug = models.SlugField(unique=True, help_text="Used for subdomain (e.g., abc-school)")
     address = models.TextField()
     contact_email = models.EmailField()
     contact_phone = models.CharField(max_length=20, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    # Subscription & Trial Management
+    # Subscription & Trial
     is_active = models.BooleanField(default=True)
     trial_ends_at = models.DateTimeField(
         default=timezone.now() + timedelta(days=2),
-        help_text="Trial period ends after 2 days by default"
+        help_text="Trial ends after 2 days"
     )
     subscription_plan = models.CharField(
         max_length=50,
         default='trial',
         choices=[
             ('trial', 'Trial'),
-            ('basic', 'Basic Plan'),
-            ('standard', 'Standard Plan'),
-            ('premium', 'Premium Plan'),
+            ('basic', 'Basic'),
+            ('standard', 'Standard'),
+            ('premium', 'Premium'),
         ]
     )
     subscription_start_date = models.DateField(null=True, blank=True)
     subscription_end_date = models.DateField(null=True, blank=True)
+
+    # Required by django-tenants
+    auto_create_schema = True
 
     def __str__(self):
         return self.name
@@ -37,7 +40,11 @@ class School(models.Model):
     class Meta:
         verbose_name = "School"
         verbose_name_plural = "Schools"
-        ordering = ['name']
+
+
+class Domain(DomainMixin):
+    """Maps subdomains to tenants (e.g., abc-school.yourdomain.com)"""
+    pass
 
 
 class SchoolSubscriptionPayment(models.Model):

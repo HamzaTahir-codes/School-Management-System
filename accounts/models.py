@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 class User(AbstractUser):
-    """Custom User model with role-based access"""
+    """Custom User - Lives inside each tenant schema"""
     class Role(models.TextChoices):
         ADMIN = 'ADMIN', _('Admin / School Owner')
         TEACHER = 'TEACHER', _('Teacher')
@@ -12,10 +12,9 @@ class User(AbstractUser):
         STUDENT = 'STUDENT', _('Student')
 
     role = models.CharField(max_length=10, choices=Role.choices)
-    school = models.ForeignKey('schools.School', on_delete=models.CASCADE, null=True, blank=True)
     phone_number = models.CharField(max_length=20, blank=True)
 
-    # Teacher-specific security fields
+    # Teacher-specific security
     force_password_change = models.BooleanField(default=False)
     default_password_used = models.BooleanField(default=False)
 
