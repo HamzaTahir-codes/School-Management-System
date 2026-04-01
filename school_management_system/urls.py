@@ -1,22 +1,58 @@
+# school_management/tenant_urls.py
 """
-URL configuration for school_management_system project.
+This file is used by ALL tenants (each school).
+It contains URLs that should be accessible only after logging into a specific school.
+"""
 
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/6.0/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    # ====================== ADMIN ======================
+    path('admin/', admin.site.urls),                    # Each school gets its own admin
+
+    # ====================== AUTHENTICATION ======================
+    path('', include('accounts.urls')),      # Login, logout, password change etc.
+
+    # ====================== ACADEMICS ======================
+    path('academics/', include('academics.urls', namespace='academics')),
+
+    # ====================== PEOPLE ======================
+    path('students/', include('people.urls', namespace='students')),
+    path('teachers/', include('people.urls', namespace='teachers')),
+    path('parents/', include('people.urls', namespace='parents')),
+
+    # ====================== ATTENDANCE ======================
+    path('attendance/', include('attendance.urls', namespace='attendance')),
+
+    # ====================== GRADING & REPORTS ======================
+    path('grading/', include('grading.urls', namespace='grading')),
+
+    # ====================== FEES ======================
+    path('fees/', include('fees.urls', namespace='fees')),
+
+    # ====================== AI ASSISTANT ======================
+    path('ai/', include('ai_assistant.urls', namespace='ai')),
+
+    # ====================== CERTIFICATES ======================
+    path('certificates/', include('certificates.urls', namespace='certificates')),
+
+    # ====================== NOTIFICATIONS ======================
+    path('notifications/', include('notifications.urls', namespace='notifications')),
+
+    # ====================== API (if you plan to add DRF later) ======================
+    # path('api/', include('api.urls', namespace='api')),
 ]
+
+# Optional: Add a simple home/dashboard redirect
+from django.shortcuts import redirect
+from django.urls import reverse
+
+def tenant_home(request):
+    """Redirect logged-in users to their dashboard"""
+    return redirect('dashboard')   # Change to your actual dashboard name
+
+# You can add this if you want a root path for tenants
+# urlpatterns = [
+#     path('', tenant_home, name='tenant_home'),
+# ] + urlpatterns

@@ -2,6 +2,7 @@ from django.db import models
 from django.utils import timezone
 from datetime import timedelta
 from django_tenants.models import TenantMixin, DomainMixin
+from django.utils.text import slugify
 
 class School(TenantMixin):
     """Main Tenant Model - Each school gets its own PostgreSQL schema"""
@@ -33,6 +34,15 @@ class School(TenantMixin):
 
     # Required by django-tenants
     auto_create_schema = True
+
+    def save(self, *args, **kwargs):
+        if not self.schema_name:
+            self.schema_name = slugify(self.slug).replace('-', '_')  # Ensure schema name is valid
+
+        if self.schema_name in ['public', 'pg_catalog', 'information_schema']:
+            raise ValueError("Schema name cannot be 'public', 'pg_catalog' or 'information_schema'")
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
