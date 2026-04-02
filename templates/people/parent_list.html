@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Parent Directory - SchoolOS{% endblock %}
+
+{% block content %}
+<div class="glass-panel p-6 rounded-3xl mb-6 flex flex-col md:flex-row justify-between items-start md:items-center">
+    <div>
+        <h2 class="text-2xl font-bold text-slate-800">Parents & Guardians</h2>
+        <p class="text-slate-500 text-sm mt-1">Contact directory and billing profiles</p>
+    </div>
+    <a href="{% url 'people:parent_add' %}" class="mt-4 md:mt-0 px-5 py-2.5 glass-btn-primary rounded-xl font-medium text-sm inline-flex items-center">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+        Add Parent/Guardian
+    </a>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for parent in parents %}
+    <div class="glass-card rounded-2xl p-6 relative">
+        {% if parent.is_fees_blocked %}
+            <div class="absolute top-4 right-4 bg-rose-100 text-rose-700 text-xs font-semibold px-2 py-1 rounded-lg">Blocked</div>
+        {% else %}
+            <div class="absolute top-4 right-4 bg-slate-100 text-slate-700 text-xs font-medium px-2 py-1 rounded-lg">Clear</div>
+        {% endif %}
+        
+        <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-pink-100 to-pink-50 mb-4 flex items-center justify-center text-pink-600 font-bold text-xl shadow-sm border border-pink-100">
+            {{ parent.user.first_name|first|default:parent.user.username|first|upper }}
+        </div>
+        <h3 class="text-lg font-bold text-slate-800">{{ parent.user.get_full_name|default:parent.user.username }}</h3>
+        <p class="text-slate-500 text-sm mt-1">{{ parent.user.email|default:"No email provided" }}</p>
+        <p class="text-slate-500 text-sm mt-1">{{ parent.user.phone_number|default:"No phone provided" }}</p>
+    </div>
+    {% empty %}
+    <div class="col-span-full text-center py-16 px-6 glass-card rounded-3xl border border-dashed border-slate-300">
+        <div class="text-slate-400 mb-3"><svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg></div>
+        <p class="text-slate-600 font-medium text-lg">No parents listed in the system</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

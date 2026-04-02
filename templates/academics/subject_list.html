@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - SchoolOS{% endblock %}
+
+{% block content %}
+<div class="mb-8 flex justify-between items-end flex-wrap gap-4">
+    <div>
+        <h1 class="text-4xl font-extrabold text-slate-800 tracking-tight">{{ title }}</h1>
+        <p class="text-slate-500 mt-2">Manage the curriculum and available subjects.</p>
+    </div>
+    <a href="{% url 'academics:subject_add' %}" class="glass-btn-primary px-6 py-3 rounded-xl font-bold shadow-lg shadow-indigo-500/20 flex items-center">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+        Add Subject
+    </a>
+</div>
+
+<div class="glass-card p-2 rounded-3xl overflow-hidden border border-white/60">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="border-b border-indigo-100 bg-indigo-50/50">
+                    <th class="p-4 font-semibold text-slate-700">Subject Name</th>
+                    <th class="p-4 font-semibold text-slate-700">Code</th>
+                    <th class="p-4 font-semibold text-slate-700">Class Level</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-indigo-50">
+                {% for subject in subjects %}
+                <tr class="hover:bg-white/40 transition-colors">
+                    <td class="p-4 font-bold text-slate-800 flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center font-bold text-xs">{{ subject.name|slice:":1" }}</div>
+                        {{ subject.name }}
+                    </td>
+                    <td class="p-4 font-bold text-slate-600">
+                        <span class="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-xs box-border">{{ subject.code }}</span>
+                    </td>
+                    <td class="p-4 text-slate-600 font-medium">{{ subject.class_level.name }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="p-8 text-center text-slate-500">No subjects defined yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

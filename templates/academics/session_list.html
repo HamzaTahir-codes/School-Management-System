@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - SchoolOS{% endblock %}
+
+{% block content %}
+<div class="mb-8 flex justify-between items-end flex-wrap gap-4">
+    <div>
+        <h1 class="text-4xl font-extrabold text-slate-800 tracking-tight">{{ title }}</h1>
+        <p class="text-slate-500 mt-2">Manage academic terms and school sessions.</p>
+    </div>
+    <a href="{% url 'academics:session_add' %}" class="glass-btn-primary px-6 py-3 rounded-xl font-bold shadow-lg shadow-indigo-500/20 flex items-center">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+        Create Session
+    </a>
+</div>
+
+<div class="glass-card p-2 rounded-3xl overflow-hidden border border-white/60">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="border-b border-indigo-100 bg-indigo-50/50">
+                    <th class="p-4 font-semibold text-slate-700">Session Name</th>
+                    <th class="p-4 font-semibold text-slate-700">Start Date</th>
+                    <th class="p-4 font-semibold text-slate-700">End Date</th>
+                    <th class="p-4 font-semibold text-slate-700 w-32">Status</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-indigo-50">
+                {% for session in sessions %}
+                <tr class="hover:bg-white/40 transition-colors">
+                    <td class="p-4 font-bold text-slate-800">{{ session.name }}</td>
+                    <td class="p-4 text-slate-600">{{ session.start_date }}</td>
+                    <td class="p-4 text-slate-600">{{ session.end_date }}</td>
+                    <td class="p-4">
+                        {% if session.is_current %}
+                        <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold border border-green-200">Current</span>
+                        {% else %}
+                        <span class="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-semibold border border-slate-200">Inactive</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="p-8 text-center text-slate-500">No sessions registered yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

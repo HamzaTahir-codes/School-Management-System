@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Teacher - SchoolOS{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="mb-4">
+        <a href="{% url 'people:teacher_list' %}" class="text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors inline-flex items-center">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+            Back to Directory
+        </a>
+    </div>
+    <div class="glass-panel p-6 md:p-8 rounded-3xl">
+        <h2 class="text-2xl font-bold text-slate-800 mb-6 border-b border-white/50 pb-4">Onboard New Teacher</h2>
+        <form method="post" class="space-y-2">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="pt-6 mt-6 border-t border-white/50 flex justify-end gap-3">
+                <a href="{% url 'people:teacher_list' %}" class="px-6 py-2.5 glass-btn rounded-xl font-medium">Cancel</a>
+                <button type="submit" class="px-8 py-2.5 glass-btn-primary rounded-xl font-medium shadow-md">Create Profile</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

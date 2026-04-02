@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign In - SchoolOS{% endblock %}
+
+{% block content %}
+<div class="flex justify-center items-center min-h-[60vh]">
+    <div class="glass-panel p-8 rounded-3xl w-full max-w-md">
+        <div class="mb-8 text-center">
+            <h2 class="text-3xl font-bold tracking-tight text-slate-800 mb-2">Welcome Back</h2>
+            <p class="text-slate-500 text-sm">Please enter your credentials to continue</p>
+        </div>
+        
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+            {{ form.as_p }}
+            
+            <div class="pt-4">
+                <button type="submit" class="w-full py-3 px-4 glass-btn-primary rounded-xl font-semibold shadow-lg transition-transform focus:outline-none focus:ring-4 focus:ring-indigo-500/30">
+                    Sign In
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
