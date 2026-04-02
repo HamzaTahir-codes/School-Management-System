@@ -18,9 +18,7 @@ urlpatterns = [
     path('academics/', include('academics.urls', namespace='academics')),
 
     # ====================== PEOPLE ======================
-    path('students/', include('people.urls', namespace='students')),
-    path('teachers/', include('people.urls', namespace='teachers')),
-    path('parents/', include('people.urls', namespace='parents')),
+    path('people/', include('people.urls', namespace='people')),
 
     # ====================== ATTENDANCE ======================
     path('attendance/', include('attendance.urls', namespace='attendance')),

@@ -9,6 +9,8 @@ from .forms import SchoolSignupForm
 from .models import School, Domain
 from accounts.models import User
 
+def index(request):
+    return render(request, 'schools/index.html')
 
 def school_signup(request):
     if request.method == 'POST':
@@ -57,7 +59,7 @@ def school_signup(request):
 
                 messages.success(request, f"School '{school_name}' created successfully!")
                 # Redirect to the new school's login page
-                return redirect(f"http://{slug}.localhost/login/")  # Change to your real domain in production 
+                return redirect(f"http://{slug}.localhost:8000/login/")  # Change to your real domain in production 
 
             except Exception as e:
                 print(f"Error creating school: {str(e)}")
