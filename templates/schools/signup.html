@@ -1,29 +1,29 @@
-{% extends 'partial/base.html' %}
-{% load static %}
-
-{% block title %}Sign Up{% endblock %}
+{% extends 'base.html' %}
+{% block title %}Create School - SchoolOS{% endblock %}
 
 {% block content %}
-<div class="signup-container">
-    <h2>Create an Account</h2>
+<div class="w-full max-w-lg mx-auto">
+    <div class="text-center mb-10">
+        <h1 class="text-4xl font-extrabold text-slate-800 tracking-tight mb-3">Onboard Your School</h1>
+        <p class="text-slate-500 font-medium">Create your isolated tenant space instantly.</p>
+    </div>
     
-    <form method="post" action="{% url 'school_signup' %}">
-        {% csrf_token %}
+    <div class="glass-panel p-8 md:p-10 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/60 relative overflow-hidden">
+        <div class="absolute -top-10 -right-10 w-32 h-32 bg-indigo-200 rounded-full blur-3xl opacity-50 z-0"></div>
+        <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-purple-200 rounded-full blur-3xl opacity-50 z-0"></div>
         
-        {% for field in form %}
-            <div class="form-group">
-                {{ field.label }}
-                {{ field }}
-                
-                {% if field.errors %}
-                    <div class="errors">
-                        {{ field.errors }}
-                    </div>
-                {% endif %}
+        <form method="post" class="space-y-2 relative z-10">
+            {% csrf_token %}
+            {{ form.as_p }}
+            
+            <div class="pt-6 mt-6 border-t border-slate-200/50">
+                <button type="submit" class="w-full py-3.5 px-4 glass-btn-primary rounded-xl font-bold shadow-lg shadow-indigo-500/20 text-lg">
+                    Create Sandbox Environment
+                </button>
             </div>
-        {% endfor %}
-        
-        <button type="submit" class="btn btn-primary">Sign Up</button>
-    </form>
+            
+            <p class="text-center text-xs text-slate-500 mt-6 font-medium">By creating a school workspace, you agree to our Terms & Privacy Policy.</p>
+        </form>
+    </div>
 </div>
 {% endblock %}
