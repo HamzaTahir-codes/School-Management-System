@@ -6,6 +6,8 @@ It contains URLs that should be accessible only after logging into a specific sc
 
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     # ====================== ADMIN ======================
@@ -54,3 +56,7 @@ def tenant_home(request):
 # urlpatterns = [
 #     path('', tenant_home, name='tenant_home'),
 # ] + urlpatterns
+
+# Serve media files in development
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
