@@ -1,5 +1,5 @@
 from django import forms
-from .models import AcademicSession, ClassLevel, Section, Subject
+from .models import AcademicSession, ClassLevel, Section, Subject, TeacherAssignment
 
 class AcademicSessionForm(forms.ModelForm):
     class Meta:
@@ -24,3 +24,8 @@ class SubjectForm(forms.ModelForm):
     class Meta:
         model = Subject
         fields = ['name', 'code', 'class_level']
+
+class TeacherAssignmentForm(forms.ModelForm):
+    class Meta:
+        model = TeacherAssignment
+        fields = ['teacher', 'class_level', 'section', 'subject', 'academic_session']

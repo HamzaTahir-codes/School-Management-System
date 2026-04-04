@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - SchoolOS{% endblock %}
+
+{% block content %}
+<div class="mb-8 flex justify-between items-end flex-wrap gap-4">
+    <div>
+        <h1 class="text-4xl font-extrabold text-slate-800 tracking-tight">{{ title }}</h1>
+        <p class="text-slate-500 mt-2">Manage official electronic credentials and documents.</p>
+    </div>
+    <a href="{% url 'certificates:certificate_add' %}" class="glass-btn-primary px-6 py-3 rounded-xl font-bold shadow-lg shadow-indigo-500/20 flex items-center">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+        Mint Document
+    </a>
+</div>
+
+<div class="glass-card p-2 rounded-3xl overflow-hidden border border-white/60">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="border-b border-indigo-100 bg-indigo-50/50">
+                    <th class="p-4 font-semibold text-slate-700">Student Name</th>
+                    <th class="p-4 font-semibold text-slate-700">Document Type</th>
+                    <th class="p-4 font-semibold text-slate-700">Creation Date</th>
+                    <th class="p-4 font-semibold text-slate-700">Action</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-indigo-50">
+                {% for doc in certificates %}
+                <tr class="hover:bg-white/40 transition-colors block md:table-row pb-4 pt-4 md:py-0 border-b md:border-b-0 border-indigo-50">
+                    <td class="p-4 font-bold text-slate-800">{{ doc.student.user.get_full_name }}</td>
+                    <td class="p-4 text-slate-600 font-medium">
+                        {% if doc.certificate_type == 'LEAVING' %}
+                        <span class="px-3 py-1 bg-rose-100 text-rose-700 rounded-full text-xs box-border">Leaving Certificate</span>
+                        {% else %}
+                        <span class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs box-border">Merit Evaluation</span>
+                        {% endif %}
+                    </td>
+                    <td class="p-4 text-slate-600">{{ doc.issued_at|date:"F j, Y, g:i a" }}</td>
+                    <td class="p-4">
+                        {% if doc.file %}
+                            <a href="{{ doc.file.url }}" target="_blank" class="px-4 py-2 bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-sm hover:bg-indigo-600 transition-colors inline-block">Download PDF</a>
+                        {% else %}
+                            <span class="text-slate-400 text-sm italic">Missing Blob</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="p-8 text-center text-slate-500">No certificates generated yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

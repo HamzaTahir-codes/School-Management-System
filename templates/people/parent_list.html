@@ -16,20 +16,23 @@
 
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     {% for parent in parents %}
-    <div class="glass-card rounded-2xl p-6 relative">
+    <a href="{% url 'people:parent_detail' parent.pk %}" class="glass-card rounded-2xl p-6 relative block" style="text-decoration:none;">
         {% if parent.is_fees_blocked %}
             <div class="absolute top-4 right-4 bg-rose-100 text-rose-700 text-xs font-semibold px-2 py-1 rounded-lg">Blocked</div>
         {% else %}
             <div class="absolute top-4 right-4 bg-slate-100 text-slate-700 text-xs font-medium px-2 py-1 rounded-lg">Clear</div>
         {% endif %}
-        
-        <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-pink-100 to-pink-50 mb-4 flex items-center justify-center text-pink-600 font-bold text-xl shadow-sm border border-pink-100">
-            {{ parent.user.first_name|first|default:parent.user.username|first|upper }}
-        </div>
+        {% if parent.user.profile_picture %}
+            <img src="{{ parent.user.profile_picture.url }}" alt="{{ parent.user.get_full_name }}" class="w-16 h-16 rounded-2xl object-cover mb-4 shadow-sm border border-pink-100">
+        {% else %}
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-pink-100 to-pink-50 mb-4 flex items-center justify-center text-pink-600 font-bold text-xl shadow-sm border border-pink-100">
+                {{ parent.user.first_name|first|default:parent.user.username|first|upper }}
+            </div>
+        {% endif %}
         <h3 class="text-lg font-bold text-slate-800">{{ parent.user.get_full_name|default:parent.user.username }}</h3>
         <p class="text-slate-500 text-sm mt-1">{{ parent.user.email|default:"No email provided" }}</p>
         <p class="text-slate-500 text-sm mt-1">{{ parent.user.phone_number|default:"No phone provided" }}</p>
-    </div>
+    </a>
     {% empty %}
     <div class="col-span-full text-center py-16 px-6 glass-card rounded-3xl border border-dashed border-slate-300">
         <div class="text-slate-400 mb-3"><svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg></div>

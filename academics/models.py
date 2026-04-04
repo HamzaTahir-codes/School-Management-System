@@ -46,3 +46,18 @@ class Subject(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.code})"
+
+
+class TeacherAssignment(models.Model):
+    """Links a teacher to a specific class + section + subject for a given session."""
+    teacher = models.ForeignKey('people.TeacherProfile', on_delete=models.CASCADE, related_name='assignments')
+    class_level = models.ForeignKey(ClassLevel, on_delete=models.CASCADE)
+    section = models.ForeignKey(Section, on_delete=models.CASCADE)
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    academic_session = models.ForeignKey(AcademicSession, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('teacher', 'class_level', 'section', 'subject', 'academic_session')
+
+    def __str__(self):
+        return f"{self.teacher} → {self.subject} ({self.class_level} {self.section})"

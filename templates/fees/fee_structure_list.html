@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - SchoolOS{% endblock %}
+
+{% block content %}
+<div class="mb-8 flex justify-between items-end flex-wrap gap-4">
+    <div>
+        <h1 class="text-4xl font-extrabold text-slate-800 tracking-tight">{{ title }}</h1>
+        <p class="text-slate-500 mt-2">Manage billing architectures across grade levels.</p>
+    </div>
+    <a href="{% url 'fees:fee_structure_add' %}" class="glass-btn-primary px-6 py-3 rounded-xl font-bold shadow-lg shadow-indigo-500/20 flex items-center">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+        New Structure
+    </a>
+</div>
+
+<div class="glass-card p-2 rounded-3xl overflow-hidden border border-white/60">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="border-b border-indigo-100 bg-indigo-50/50">
+                    <th class="p-4 font-semibold text-slate-700">Class Level</th>
+                    <th class="p-4 font-semibold text-slate-700">Session</th>
+                    <th class="p-4 font-semibold text-slate-700">Fee Category</th>
+                    <th class="p-4 font-semibold text-slate-700">Amount</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-indigo-50">
+                {% for st in structures %}
+                <tr class="hover:bg-white/40 transition-colors">
+                    <td class="p-4 font-bold text-slate-800">{{ st.class_level.name }}</td>
+                    <td class="p-4 text-slate-600 font-medium">{{ st.academic_session.name }}</td>
+                    <td class="p-4 text-slate-600">
+                        <span class="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-xs box-border">{{ st.fee_type }}</span>
+                    </td>
+                    <td class="p-4 font-bold text-green-600">${{ st.amount }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="p-8 text-center text-slate-500">No fee structures configured.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

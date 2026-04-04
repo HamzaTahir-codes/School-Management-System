@@ -9,4 +9,4 @@ class FeeStructureForm(forms.ModelForm):
 class StudentFeePaymentForm(forms.ModelForm):
     class Meta:
         model = StudentFeePayment
-        fields = ['student', 'amount_paid', 'month', 'is_confirmed']
+        fields = ['student', 'fee_structure', 'academic_session', 'amount_paid', 'month', 'is_confirmed']

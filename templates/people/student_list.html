@@ -16,13 +16,16 @@
 
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     {% for student in students %}
-    <div class="glass-card rounded-2xl p-6 relative">
+    <a href="{% url 'people:student_detail' student.pk %}" class="glass-card rounded-2xl p-6 relative block" style="text-decoration:none;">
         <div class="absolute top-4 right-4 bg-purple-100 text-purple-700 text-xs font-semibold px-2 py-1 rounded-lg shadow-sm">{{ student.status|default:"Active" }}</div>
-        <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-purple-100 to-purple-50 mb-4 flex items-center justify-center text-purple-600 font-bold text-xl shadow-sm border border-purple-100">
-            {{ student.user.first_name|first|default:student.user.username|first|upper }}
-        </div>
+        {% if student.user.profile_picture %}
+            <img src="{{ student.user.profile_picture.url }}" alt="{{ student.user.get_full_name }}" class="w-16 h-16 rounded-2xl object-cover mb-4 shadow-sm border border-purple-100">
+        {% else %}
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-purple-100 to-purple-50 mb-4 flex items-center justify-center text-purple-600 font-bold text-xl shadow-sm border border-purple-100">
+                {{ student.user.first_name|first|default:student.user.username|first|upper }}
+            </div>
+        {% endif %}
         <h3 class="text-lg font-bold text-slate-800">{{ student.user.get_full_name|default:student.user.username }}</h3>
-        
         <div class="mt-4 grid grid-cols-2 gap-2 text-sm border-t border-slate-200/50 pt-3">
             <div>
                 <span class="text-slate-400 block text-xs">Class</span>
@@ -33,7 +36,7 @@
                 <span class="text-slate-700 font-medium">{{ student.roll_number }}</span>
             </div>
         </div>
-    </div>
+    </a>
     {% empty %}
     <div class="col-span-full text-center py-16 px-6 glass-card rounded-3xl border border-dashed border-slate-300">
         <div class="text-slate-400 mb-3"><svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 14l9-5-9-5-9 5 9 5z"></path></svg></div>

@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - SchoolOS{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="flex items-center justify-between mb-8">
+        <h1 class="text-3xl font-extrabold text-slate-800">{{ title }}</h1>
+        {% if back_url %}
+        <a href="{{ back_url }}" class="glass-btn px-4 py-2 rounded-xl text-sm font-medium">
+            <span class="mr-2">&larr;</span> Back
+        </a>
+        {% endif %}
+    </div>
+
+    <div class="glass-card p-8 md:p-10 rounded-3xl relative overflow-hidden">
+        <div class="absolute -right-10 -top-10 w-40 h-40 bg-indigo-200 rounded-full blur-3xl opacity-30 pointer-events-none"></div>
+        <div class="absolute -left-10 -bottom-10 w-40 h-40 bg-purple-200 rounded-full blur-3xl opacity-30 pointer-events-none"></div>
+        
+        <form method="post" class="space-y-2 relative z-10">
+            {% csrf_token %}
+            {{ form.as_p }}
+            
+            <div class="pt-6 mt-6 border-t border-slate-200/50">
+                <button type="submit" class="w-full glass-btn-primary py-3.5 rounded-xl font-bold text-lg shadow-lg shadow-indigo-500/20">
+                    Process Transaction
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

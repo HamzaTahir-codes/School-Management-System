@@ -13,6 +13,7 @@ class User(AbstractUser):
 
     role = models.CharField(max_length=10, choices=Role.choices)
     phone_number = models.CharField(max_length=20, blank=True)
+    profile_picture = models.ImageField(upload_to='profile_pics/%Y/%m/', blank=True, null=True)
 
     # Teacher-specific security
     force_password_change = models.BooleanField(default=False)
