@@ -1,0 +1,46 @@
+ M academics/forms.py
+ M academics/models.py
+ M academics/urls.py
+ M academics/views.py
+ M accounts/models.py
+ M attendance/urls.py
+ M attendance/views.py
+ M certificates/urls.py
+ M certificates/views.py
+ M fees/forms.py
+ M fees/models.py
+ M fees/urls.py
+ M fees/views.py
+ M grading/urls.py
+ M grading/views.py
+ M people/forms.py
+ M people/urls.py
+ M people/views.py
+ M school_management_system/settings.py
+ M school_management_system/urls.py
+ M static/css/style.css
+ M templates/base.html
+ M templates/people/parent_form.html
+ M templates/people/parent_list.html
+ M templates/people/student_form.html
+ M templates/people/student_list.html
+ M templates/people/teacher_form.html
+ M templates/people/teacher_list.html
+?? academics/migrations/0002_teacherassignment.py
+?? accounts/migrations/0002_user_profile_picture.py
+?? fees/migrations/0002_studentfeepayment_academic_session_and_more.py
+?? git_status.txt
+?? implementation_plan.md
+?? schools/migrations/0003_alter_school_trial_ends_at.py
+?? status.txt
+?? templates/academics/assignment_list.html
+?? templates/academics/confirm_delete.html
+?? templates/certificates/
+?? templates/fees/
+?? templates/grading/
+?? templates/people/confirm_delete.html
+?? templates/people/parent_detail.html
+?? templates/people/profile_edit.html
+?? templates/people/student_detail.html
+?? templates/people/teacher_detail.html
+?? templates/shared/
