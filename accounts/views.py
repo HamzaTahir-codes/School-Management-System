@@ -62,6 +62,35 @@ def dashboard_view(request):
         # Recent activity
         context['recent_students'] = StudentProfile.objects.select_related('user', 'class_level').order_by('-admission_date')[:5]
 
+    elif role == 'TEACHER':
+        try:
+            profile = request.user.teacher_profile
+            context['teacher_profile'] = profile
+            context['assignments'] = profile.get_active_assignments()
+            context['total_students_managed'] = profile.get_total_students_count()
+        except TeacherProfile.DoesNotExist:
+            messages.warning(request, "Teacher profile not found. Please contact admin.")
+
+    elif role == 'STUDENT':
+        try:
+            profile = request.user.student_profile
+            context['student_profile'] = profile
+            context['attendance_summary'] = profile.get_attendance_stats()
+            context['fee_summary'] = profile.get_fee_status()
+            
+            from grading.models import Mark
+            context['recent_marks'] = Mark.objects.filter(student=profile).select_related('subject', 'teacher__user').order_by('-id')[:5]
+        except StudentProfile.DoesNotExist:
+            messages.warning(request, "Student profile not found.")
+
+    elif role == 'PARENT':
+        try:
+            profile = request.user.parent_profile
+            context['parent_profile'] = profile
+            context['children'] = profile.children.all().select_related('class_level', 'user')
+        except ParentProfile.DoesNotExist:
+            messages.warning(request, "Parent profile not found.")
+
     return render(request, 'accounts/dashboard.html', context)
 
 @login_required

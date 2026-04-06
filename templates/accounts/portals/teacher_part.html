@@ -1,0 +1,96 @@
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+    <div class="glass-card-stats p-6 rounded-3xl relative overflow-hidden group hover:scale-[1.02] transition-all">
+        <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-indigo-100 rounded-full blur-2xl opacity-40"></div>
+        <div class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">My Students</div>
+        <div class="text-3xl font-extrabold text-slate-800">{{ total_students_managed }}</div>
+        <div class="text-sm text-slate-500 mt-1">Across all sections</div>
+    </div>
+    
+    <div class="glass-card-stats p-6 rounded-3xl relative overflow-hidden group hover:scale-[1.02] transition-all">
+        <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-purple-100 rounded-full blur-2xl opacity-40"></div>
+        <div class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">My Classes</div>
+        <div class="text-3xl font-extrabold text-slate-800">{{ assignments.count }}</div>
+        <div class="text-sm text-slate-500 mt-1">Current Session</div>
+    </div>
+
+    <div class="glass-card-stats p-6 rounded-3xl relative overflow-hidden group hover:scale-[1.02] transition-all">
+        <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-emerald-100 rounded-full blur-2xl opacity-40"></div>
+        <div class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Attendance</div>
+        <div class="text-3xl font-extrabold text-slate-800">Ready</div>
+        <div class="text-sm text-slate-500 mt-1">Click to mark today</div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+    <!-- Active Assignments -->
+    <div class="glass-panel p-6 rounded-3xl border border-white/60 shadow-xl">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-bold text-slate-800">My Assignments</h3>
+            <span class="px-3 py-1 bg-indigo-100 text-indigo-600 rounded-lg text-xs font-bold uppercase">Current</span>
+        </div>
+        <div class="space-y-4">
+            {% for assignment in assignments %}
+            <div class="flex items-center justify-between p-4 bg-white/40 rounded-2xl border border-white/60 hover:bg-white/60 transition group">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
+                        {{ assignment.subject.name|first|upper }}
+                    </div>
+                    <div>
+                        <div class="font-bold text-slate-800">{{ assignment.subject.name }}</div>
+                        <div class="text-xs text-slate-400 font-semibold">{{ assignment.class_level.name }} - Section {{ assignment.section.name }}</div>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <a href="{% url 'attendance:student_attendance_list' %}?class={{ assignment.class_level.pk }}&section={{ assignment.section.pk }}" class="p-2 hover:bg-indigo-50 text-indigo-600 rounded-lg transition" title="Mark Attendance">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                    </a>
+                    <a href="{% url 'grading:mark_add' %}" class="p-2 hover:bg-purple-50 text-purple-600 rounded-lg transition" title="Enter Marks">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 012.828 0L20 7.586a2 2 0 010 2.828l-9.828 9.828l-4 1l1-4L16.586 3.414z"></path></svg>
+                    </a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="text-center py-10">
+                <div class="text-slate-400 mb-2 font-medium">No assignments found</div>
+                <p class="text-sm text-slate-400 italic">Please contact your administrator for class assignments.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Quick Actions & Schedule Placeholder -->
+    <div class="space-y-6">
+        <div class="glass-panel p-6 rounded-3xl border border-white/60 shadow-xl bg-gradient-to-tr from-indigo-50/30 to-transparent">
+            <h3 class="text-xl font-bold text-slate-800 mb-6">Staff Quick Access</h3>
+            <div class="grid grid-cols-2 gap-4">
+                <a href="{% url 'attendance:leave_request_add' %}" class="flex flex-col items-center justify-center p-6 bg-white/40 rounded-2xl border border-white/60 hover:bg-white/80 transition group shadow-sm text-center" style="text-decoration:none;">
+                    <div class="w-10 h-10 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center mb-3 group-hover:scale-110 transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    </div>
+                    <span class="text-sm font-bold text-slate-700">Request Leave</span>
+                </a>
+                
+                <a href="#" class="flex flex-col items-center justify-center p-6 bg-white/40 rounded-2xl border border-white/60 hover:bg-white/80 transition group shadow-sm text-center" style="text-decoration:none;">
+                    <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center mb-3 group-hover:scale-110 transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                    </div>
+                    <span class="text-sm font-bold text-slate-700">Messages</span>
+                </a>
+            </div>
+        </div>
+        
+        <div class="glass-panel p-6 rounded-3xl border border-white/60 shadow-xl">
+             <h3 class="text-xl font-bold text-slate-800 mb-6 font-display">Resources</h3>
+             <div class="space-y-4">
+                 <div class="flex items-center gap-3 text-slate-500 hover:text-indigo-600 transition cursor-pointer">
+                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.082.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.082.477-4.5 1.253"></path></svg>
+                     <span class="text-sm font-semibold">Teacher's Guide Book</span>
+                 </div>
+                 <div class="flex items-center gap-3 text-slate-500 hover:text-indigo-600 transition cursor-pointer">
+                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                     <span class="text-sm font-semibold">School Curriculum PDF</span>
+                 </div>
+             </div>
+        </div>
+    </div>
+</div>

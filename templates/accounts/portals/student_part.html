@@ -1,0 +1,108 @@
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+    <div class="glass-card-stats p-6 rounded-3xl relative overflow-hidden group hover:scale-[1.02] transition-all">
+        <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-indigo-100 rounded-full blur-2xl opacity-40"></div>
+        <div class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Attendance</div>
+        <div class="text-3xl font-extrabold text-slate-800">{{ attendance_summary.percentage }}%</div>
+        <div class="text-sm text-slate-500 mt-1">{{ attendance_summary.present }} of {{ attendance_summary.total }} days</div>
+    </div>
+    
+    <div class="glass-card-stats p-6 rounded-3xl relative overflow-hidden group hover:scale-[1.02] transition-all">
+        <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-purple-100 rounded-full blur-2xl opacity-40"></div>
+        <div class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">GPA / Status</div>
+        <div class="text-3xl font-extrabold text-slate-800">
+            {% with first_mark=recent_marks.0 %}
+                {% if first_mark %}
+                    {{ student_profile.status|title }}
+                {% else %}
+                    Active
+                {% endif %}
+            {% endwith %}
+        </div>
+        <div class="text-sm text-slate-500 mt-1">Academic Standing</div>
+    </div>
+
+    <div class="glass-card-stats p-6 rounded-3xl relative overflow-hidden group hover:scale-[1.02] transition-all">
+        <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-emerald-100 rounded-full blur-2xl opacity-40"></div>
+        <div class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Fee Balance</div>
+        <div class="text-3xl font-extrabold {% if fee_summary.balance > 0 %}text-rose-500{% else %}text-emerald-600{% endif %}">
+            ${{ fee_summary.balance|floatformat:0 }}
+        </div>
+        <div class="text-sm text-slate-500 mt-1">Pending Dues</div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
+    <!-- Recent Marks -->
+    <div class="lg:col-span-2 space-y-8">
+        <div class="glass-panel p-6 rounded-3xl border border-white/60 shadow-xl">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold text-slate-800">Latest Assessments</h3>
+                <a href="{% url 'grading:report_list' %}" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 transition" style="text-decoration:none;">View Full Report Card</a>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="text-xs uppercase text-slate-400 tracking-widest">
+                            <th class="pb-4 font-bold">Subject</th>
+                            <th class="pb-4 font-bold">Term</th>
+                            <th class="pb-4 font-bold">Score</th>
+                            <th class="pb-4 font-bold">Teacher</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100/50">
+                        {% for mark in recent_marks %}
+                        <tr class="group">
+                            <td class="py-4">
+                                <div class="font-bold text-slate-800">{{ mark.subject.name }}</div>
+                            </td>
+                            <td class="py-4 text-sm text-slate-500">{{ mark.term }}</td>
+                            <td class="py-4">
+                                <div class="px-3 py-1 rounded-lg bg-indigo-50 text-indigo-600 inline-block font-bold">
+                                    {{ mark.marks_obtained|floatformat:0 }} / {{ mark.max_marks|floatformat:0 }}
+                                </div>
+                            </td>
+                            <td class="py-4 text-sm text-slate-500">{{ mark.teacher.user.get_full_name }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="py-10 text-center text-slate-400 italic">No marks recorded yet for this session.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="space-y-6">
+        <div class="glass-panel p-6 rounded-3xl border border-white/60 shadow-xl bg-gradient-to-tr from-purple-50/30 to-transparent">
+            <h3 class="text-xl font-bold text-slate-800 mb-6">Student Toolkit</h3>
+            <div class="space-y-3">
+                <a href="{% url 'fees:payment_add' %}" class="w-full py-4 bg-emerald-600 text-white rounded-2xl flex items-center justify-center gap-2 font-bold shadow-lg shadow-emerald-200 hover:bg-emerald-700 transition" style="text-decoration:none;">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    Pay Pending Fees
+                </a>
+                
+                <a href="{% url 'attendance:leave_request_add' %}" class="w-full py-4 bg-white/60 text-slate-700 rounded-2xl border border-white/80 flex items-center justify-center gap-2 font-bold hover:bg-white/90 transition" style="text-decoration:none;">
+                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                     Apply for Leave
+                </a>
+            </div>
+        </div>
+        
+        <div class="glass-panel p-6 rounded-3xl border border-white/60 shadow-xl">
+            <h4 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Class Information</h4>
+            <div class="flex items-center gap-4 p-3 bg-indigo-50/50 rounded-2xl border border-indigo-100">
+                <div class="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center font-extrabold text-lg">
+                    {{ student_profile.class_level.name|slice:":1" }}
+                </div>
+                <div>
+                    <div class="font-bold text-slate-800">{{ student_profile.class_level.name }}</div>
+                    <div class="text-xs text-slate-500">Roll No: {{ student_profile.roll_number }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
