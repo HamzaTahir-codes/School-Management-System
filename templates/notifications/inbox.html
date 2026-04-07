@@ -1,0 +1,337 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Inbox - SchoolOS{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto w-full py-8" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4 px-4 overflow-hidden">
+        <div>
+            <h1 class="text-4xl font-extrabold text-slate-800 tracking-tight">Communication Hub</h1>
+            <p class="text-slate-500 font-medium">Manage your messages and official school alerts.</p>
+        </div>
+        <div class="flex gap-3">
+            {% if user.role == 'ADMIN' %}
+            <a href="{% url 'notifications:broadcast_add' %}"
+                class="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-2xl font-bold shadow-xl shadow-indigo-200 hover:bg-indigo-700 transition"
+                style="text-decoration:none;">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                New Announcement
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Tabbed Navigation -->
+    <div
+        class="flex gap-2 p-1.5 bg-slate-100/50 backdrop-blur-sm rounded-2xl mb-8 mx-4 w-fit border border-slate-200/50">
+        <a href="?tab=unread"
+            class="px-6 py-2.5 rounded-xl font-bold text-sm transition {% if current_tab == 'unread' %} bg-white text-indigo-600 shadow-sm {% else %} text-slate-500 hover:text-slate-700 {% endif %}"
+            style="text-decoration:none;">Unread</a>
+        <a href="?tab=all"
+            class="px-6 py-2.5 rounded-xl font-bold text-sm transition {% if current_tab == 'all' %} bg-white text-indigo-600 shadow-sm {% else %} text-slate-500 hover:text-slate-700 {% endif %}"
+            style="text-decoration:none;">All Messages</a>
+        {% if user.role == 'ADMIN' %}
+        <a href="?tab=sent"
+            class="px-6 py-2.5 rounded-xl font-bold text-sm transition {% if current_tab == 'sent' %} bg-white text-indigo-600 shadow-sm {% else %} text-slate-500 hover:text-slate-700 {% endif %}"
+            style="text-decoration:none;">Outbox</a>
+        {% endif %}
+    </div>
+
+    <!-- Messages List -->
+    <div class="space-y-6 px-4">
+
+        {% if current_tab == 'sent' %}
+        <h2 class="text-lg font-bold text-slate-800 mb-4 px-2">Sent Announcements</h2>
+        {% for item in sent_broadcasts %}
+        <div class="glass-panel p-6 rounded-3xl border border-white/60 shadow-lg bg-white/40 mb-4">
+            <div class="flex justify-between items-start mb-4">
+                <div class="flex items-center gap-3">
+                    <span
+                        class="px-3 py-1 bg-indigo-100 text-indigo-600 rounded-full text-[10px] font-black uppercase tracking-widest">{{ item.target_role }}</span>
+                    <span class="text-[11px] font-bold text-slate-400 italic">Sent {{ item.created_at|date:"M d, Y" }}</span>
+                </div>
+                <div
+                    class="px-4 py-1.5 bg-emerald-50 text-emerald-600 rounded-2xl text-[11px] font-bold border border-emerald-100 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                        </path>
+                    </svg>
+                    Read by {{ item.broadcastreadstatus_set.count }} users
+                </div>
+            </div>
+            <h3 class="text-xl font-bold text-slate-800">{{ item.title }}</h3>
+            <p class="text-slate-600 mt-2 leading-relaxed">{{ item.message }}</p>
+
+            <!-- Responses Section -->
+            <div class="mt-6 pt-6 border-t border-slate-200/50">
+                <div class="flex items-center justify-between mb-4">
+                    <h4 class="text-sm font-bold text-slate-700">Responses ({{ item.responses.count }})</h4>
+                    {% if item.responses.count > 0 %}
+                    <button onclick="document.getElementById('responses-{{ item.id }}').classList.toggle('hidden')"
+                        class="text-xs font-bold text-indigo-600 hover:underline">View Responses</button>
+                    {% endif %}
+                </div>
+                <div id="responses-{{ item.id }}" class="hidden space-y-3">
+                    {% for resp in item.responses.all %}
+                    <div class="p-4 bg-white/60 rounded-2xl border border-white/80">
+                        <div class="flex justify-between items-start mb-1">
+                            <span class="font-bold text-slate-800 text-sm">{{ resp.sender.username }} ({{
+                                resp.sender.role }})</span>
+                            <span class="text-[10px] font-bold text-slate-400">{{ resp.created_at|timesince }}
+                                ago</span>
+                        </div>
+                        <p class="text-sm text-slate-600">{{ resp.message }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+
+        <!-- Combined Broadcasts and Individual Alerts -->
+        {% if not broadcasts and not notifications %}
+        <div class="text-center py-20 bg-white/30 rounded-[3rem] border-2 border-dashed border-slate-200">
+            <div
+                class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300">
+                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4">
+                    </path>
+                </svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-800">Your inbox is empty</h3>
+            <p class="text-slate-500">No new messages at the moment.</p>
+        </div>
+        {% endif %}
+
+        <!-- Rendering Broadcasts -->
+        {% for item in broadcasts %}
+        <div id="broadcast-{{ item.id }}"
+            class="glass-panel p-6 rounded-3xl transition-all duration-500 group relative overflow-hidden mb-6 
+                                {% if item.id in read_broadcast_ids %} bg-white/20 opacity-70 border border-slate-200/50 scale-[0.98] {% else %} bg-white/70 border-l-[12px] border-l-emerald-500 shadow-xl border border-white/60 cursor-pointer hover:bg-white/90 {% endif %}"
+            {% if item.id not in read_broadcast_ids %} hx-post="{% url 'notifications:mark_read' %}"
+            hx-vals='{"id": "{{ item.id }}", "type": "broadcast"}' hx-trigger="click consume" hx-target="this"
+            hx-swap="none" {% endif %}>
+
+            <div class="absolute top-0 right-0 p-4 flex gap-2 z-10">
+                <button hx-post="{% url 'notifications:delete_message' %}" hx-target="#broadcast-{{ item.id }}"
+                    hx-swap="outerHTML" hx-vals='{"id": "{{ item.id }}", "type": "broadcast"}'
+                    hx-trigger="click consume"
+                    class="p-2 text-slate-400 hover:text-rose-500 transition rounded-xl hover:bg-rose-50"
+                    title="Delete">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="flex items-start gap-5">
+                <div
+                    class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white shadow-lg flex-shrink-0">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z">
+                        </path>
+                    </svg>
+                </div>
+                <div class="flex-grow">
+                    <div class="flex items-center gap-3 mb-1">
+                        <h4
+                            class="text-xl font-bold {% if item.id in read_broadcast_ids %} text-slate-500 {% else %} text-slate-800 {% endif %}">
+                            {{ item.title }}</h4>
+                        <span
+                            class="px-2 py-0.5 {% if item.id in read_broadcast_ids %} bg-slate-100 text-slate-400 {% else %} bg-indigo-100 text-indigo-600 {% endif %} rounded-md text-[9px] font-black uppercase tracking-widest">OFFICIAL</span>
+                        {% if item.id not in read_broadcast_ids %}
+                        <span
+                            class="px-2 py-0.5 bg-emerald-500 text-white rounded-md text-[9px] font-black animate-pulse">NEW</span>
+                        {% endif %}
+                    </div>
+                    <p
+                        class="{% if item.id in read_broadcast_ids %} text-slate-400 {% else %} text-slate-600 {% endif %} leading-relaxed text-md pr-10">
+                        {{ item.message }}</p>
+
+                    <div class="mt-4 flex items-center justify-between pb-4 border-b border-slate-200/50">
+                        <div class="flex items-center gap-4 text-[11px] font-bold text-slate-400">
+                            <span class="flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>{{ item.created_at|date:"M d, Y" }}</span>
+                            <span class="flex items-center gap-1 uppercase tracking-tighter">By {{
+                                item.created_by.username }}</span>
+                        </div>
+                        <button
+                            onclick="document.getElementById('reply-form-{{ item.id }}').classList.toggle('hidden'); event.stopPropagation();"
+                            class="px-4 py-2 bg-white/80 hover:bg-indigo-600 hover:text-white border border-slate-200 rounded-xl text-xs font-bold transition shadow-sm z-10">Reply
+                            To Announcement</button>
+                    </div>
+
+                    <!-- Inline Reply Form -->
+                    <div id="reply-form-{{ item.id }}" class="hidden mt-4 animate-slide-up"
+                        onclick="event.stopPropagation();">
+                        <form action="{% url 'notifications:reply_create' %}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="broadcast_id" value="{{ item.id }}">
+                            <textarea name="message" required
+                                class="w-full p-4 bg-white/80 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400 transition outline-none text-sm font-medium"
+                                placeholder="Write your response..."></textarea>
+                            <div class="mt-3 flex justify-end">
+                                <button type="submit"
+                                    class="px-6 py-2 bg-indigo-600 text-white rounded-xl font-bold text-sm shadow-md shadow-indigo-100 hover:bg-indigo-700 transition">Send
+                                    Reply</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- Rendering Personal Alerts -->
+        {% for item in notifications %}
+        <div id="alert-{{ item.id }}"
+            class="p-6 rounded-3xl transition-all duration-500 flex items-start justify-between group mb-4 relative overflow-hidden 
+                            {% if not item.is_read %} bg-white/70 border-l-[12px] border-l-emerald-500 shadow-xl border border-white/60 cursor-pointer hover:bg-white/90 {% else %} bg-white/20 opacity-70 border border-slate-200/50 scale-[0.98] {% endif %}"
+            {% if not item.is_read %} hx-post="{% url 'notifications:mark_read' %}" hx-target="this" hx-swap="none"
+            hx-vals='{"id": "{{ item.id }}", "type": "notification"}' hx-trigger="click consume" {% endif %}>
+
+            <div class="flex items-start gap-5">
+                <div
+                    class="w-12 h-12 rounded-2xl {% if not item.is_read %} bg-emerald-50 text-emerald-600 animate-pulse-slow {% else %} bg-slate-50 text-slate-400 {% endif %} flex items-center justify-center shadow-inner flex-shrink-0">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <div class="flex-grow">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span
+                            class="text-[9px] font-black {% if not item.is_read %} text-emerald-600 bg-emerald-50 {% else %} text-slate-400 bg-slate-50 {% endif %} uppercase tracking-widest px-2 py-0.5 rounded-md">{{
+                            item.category }}</span>
+                        <span class="w-1 h-1 rounded-full bg-slate-300"></span>
+                        <span class="text-[10px] font-bold text-slate-400 italic">{{ item.created_at|timesince }}
+                            ago</span>
+                        {% if not item.is_read %}
+                        <span
+                            class="px-2 py-0.5 bg-emerald-500 text-white rounded-md text-[9px] font-black animate-pulse">NEW</span>
+                        {% endif %}
+                    </div>
+                    <div
+                        class="text-lg font-bold {% if not item.is_read %} text-slate-800 {% else %} text-slate-500 {% endif %} leading-tight mb-2">
+                        {{ item.message }}</div>
+
+                    <div class="flex items-center gap-4 mt-4">
+                        {% if not item.is_read %}
+                        <button
+                            class="flex items-center gap-1.5 px-4 py-1.5 bg-emerald-600 text-white rounded-xl text-xs font-bold shadow-lg shadow-emerald-100 hover:bg-emerald-700 transition active:scale-95 z-20">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Mark as Read
+                        </button>
+                        {% endif %}
+                        <button
+                            onclick="document.getElementById('reply-alert-{{ item.id }}').classList.toggle('hidden'); event.stopPropagation();"
+                            class="text-xs font-bold text-slate-400 hover:text-indigo-600 hover:underline z-20 transition">Reply
+                            to Admin</button>
+                    </div>
+
+                    <!-- Inline Reply Form for Alert -->
+                    <div id="reply-alert-{{ item.id }}" class="hidden mt-4 animate-slide-up w-full md:w-96"
+                        onclick="event.stopPropagation();">
+                        <form action="{% url 'notifications:reply_create' %}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="notification_id" value="{{ item.id }}">
+                            <textarea name="message" required
+                                class="w-full p-4 bg-white/90 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-emerald-100 focus:border-emerald-400 transition outline-none text-sm font-medium"
+                                placeholder="Your reply to admin..."></textarea>
+                            <div class="mt-3 flex justify-end">
+                                <button type="submit"
+                                    class="px-6 py-2 bg-emerald-600 text-white rounded-xl font-bold text-sm shadow-md shadow-emerald-100 hover:bg-emerald-700 transition">Send</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col items-end gap-2 pr-2">
+                <button hx-post="{% url 'notifications:delete_message' %}" hx-target="#alert-{{ item.id }}"
+                    hx-swap="outerHTML" hx-vals='{"id": "{{ item.id }}", "type": "notification"}'
+                    hx-trigger="click consume"
+                    class="p-2 text-slate-300 hover:text-rose-500 transition rounded-xl opacity-0 group-hover:opacity-100 bg-white shadow-sm border border-slate-100 z-20">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- Pagination Controls -->
+        {% if is_paginated %}
+        <div class="flex items-center justify-center gap-2 mt-10 py-6 border-t border-slate-100">
+            {% if page_obj.has_previous %}
+            <a href="?tab={{ current_tab }}&page={{ page_obj.previous_page_number }}"
+                class="px-4 py-2 bg-white rounded-xl border border-slate-200 text-sm font-bold text-slate-600 hover:bg-indigo-50 transition"
+                style="text-decoration:none;">Previous</a>
+            {% endif %}
+
+            <span class="text-sm font-bold text-slate-400 px-4">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
+
+            {% if page_obj.has_next %}
+            <a href="?tab={{ current_tab }}&page={{ page_obj.next_page_number }}"
+                class="px-4 py-2 bg-white rounded-xl border border-slate-200 text-sm font-bold text-slate-600 hover:bg-indigo-50 transition"
+                style="text-decoration:none;">Next</a>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .notification-badge {
+        display: none !important;
+    }
+
+    @keyframes pulse-slow {
+
+        0%,
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: 0.8;
+            transform: scale(1.02);
+        }
+    }
+
+    .animate-pulse-slow {
+        animation: pulse-slow 3s infinite ease-in-out;
+    }
+
+    /* Smooth transition for read/unread state change */
+    .glass-panel,
+    div[id^="alert-"] {
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+</style>
+{% endblock %}
