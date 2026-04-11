@@ -34,6 +34,8 @@ DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = ['*']
 
+CSRF_TRUSTED_ORIGINS = ['https://judgementally-aerogenic-kristina.ngrok-free.dev']
+
 
 # Application definition
 
@@ -63,9 +65,11 @@ TENANT_APPS = [
     'ai_assistant',
     'certificates',
     'notifications',
+    'core',
+    'contact',
 ]
 
-INSTALLED_APPS = SHARED_APPS + [app for app in TENANT_APPS if app not in SHARED_APPS]
+INSTALLED_APPS = list(set(SHARED_APPS + TENANT_APPS))
 
 # 2. Tenant Configuration
 TENANT_MODEL = "schools.School"          # ← Your tenant model

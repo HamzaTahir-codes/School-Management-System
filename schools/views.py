@@ -20,6 +20,8 @@ def school_signup(request):
             slug = form.cleaned_data['slug']
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
+            tagline = form.cleaned_data.get('tagline', '')
+            about_text = form.cleaned_data.get('about_text', '')
 
             # Check if slug already exists
             if School.objects.filter(schema_name=slug).exists():
@@ -32,6 +34,8 @@ def school_signup(request):
                     name=school_name,
                     slug=slug,
                     contact_email=email,
+                    tagline=tagline,
+                    about_text=about_text,
                     trial_ends_at=timezone.now() + timedelta(days=2),
                     is_active=True,
                 )

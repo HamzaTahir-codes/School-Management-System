@@ -18,6 +18,8 @@ class SchoolSignupForm(forms.Form):
     email = forms.EmailField(label="Admin Email")
     password = forms.CharField(widget=forms.PasswordInput(), label="Password")
     password_confirm = forms.CharField(widget=forms.PasswordInput(), label="Confirm Password")
+    tagline = forms.CharField(max_length=255, required=False, label="School Tagline", help_text="e.g. Empowering the Leaders of Tomorrow")
+    about_text = forms.CharField(widget=forms.Textarea, required=False, label="About School", help_text="A brief description of your school")
 
     def clean(self):
         cleaned_data = super().clean()

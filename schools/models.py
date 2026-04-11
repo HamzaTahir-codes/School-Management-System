@@ -13,6 +13,13 @@ class School(TenantMixin):
     contact_phone = models.CharField(max_length=20, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    # Landing Page Identity Fields
+    tagline = models.CharField(max_length=255, blank=True, help_text="A short, catchy phrase about the school.")
+    about_text = models.TextField(blank=True, help_text="Detailed 'About Us' description.")
+    mission = models.TextField(blank=True, help_text="School's mission statement.")
+    vision = models.TextField(blank=True, help_text="School's vision statement.")
+    logo = models.ImageField(upload_to='school_logos/', blank=True, null=True)
+
     # Subscription & Trial
     is_active = models.BooleanField(default=True)
     trial_ends_at = models.DateTimeField(

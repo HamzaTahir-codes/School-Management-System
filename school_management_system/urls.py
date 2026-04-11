@@ -8,8 +8,10 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from core import views as core_views
 
 urlpatterns = [
+    path('', core_views.school_index, name='school_index'),
     # ====================== ADMIN ======================
     path('admin/', admin.site.urls),                    # Each school gets its own admin
 
@@ -39,6 +41,12 @@ urlpatterns = [
 
     # ====================== NOTIFICATIONS ======================
     path('notifications/', include('notifications.urls', namespace='notifications')),
+
+    # ====================== CORE SETTINGS ======================
+    path('core/', include('core.urls', namespace='core')),
+    
+    # ====================== CONTACT ======================
+    path('contact/', include('contact.urls', namespace='contact')),
 
     # ====================== API (if you plan to add DRF later) ======================
     # path('api/', include('api.urls', namespace='api')),
