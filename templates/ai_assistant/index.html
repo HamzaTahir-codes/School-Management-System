@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}AI Assistant{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto w-full py-8">
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight">AI Assistant Hub</h1>
+            <p class="text-slate-500 mt-2">Interact with our next-generation educational intelligence system.</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Coming Soon -->
+        <div class="glass-card p-8 rounded-3xl border border-indigo-200 relative overflow-hidden h-full flex flex-col justify-center items-center text-center">
+             <div class="absolute inset-0 bg-gradient-to-tr from-indigo-500/10 to-purple-500/10"></div>
+             <div class="w-20 h-20 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white mb-6 shadow-xl shadow-indigo-500/30 relative z-10 animate-bounce">
+                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            </div>
+            <h3 class="text-2xl font-bold text-slate-800 mb-3 relative z-10">AI Chatbot API</h3>
+            <p class="text-slate-500 leading-relaxed relative z-10 max-w-sm">The intelligent student query and tutor system is currently being integrated and will be available to answer questions 24/7 soon.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

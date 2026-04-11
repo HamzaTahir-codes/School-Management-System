@@ -4,6 +4,7 @@ from . import views
 app_name = 'grading'
 
 urlpatterns = [
+    path('', views.index, name='index'),
     path('marks/', views.MarkListView.as_view(), name='mark_list'),
     path('marks/add/', views.MarkCreateView.as_view(), name='mark_add'),
     path('marks/<int:pk>/edit/', views.MarkUpdateView.as_view(), name='mark_edit'),

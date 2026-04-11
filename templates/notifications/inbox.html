@@ -50,8 +50,7 @@
         <div class="glass-panel p-6 rounded-3xl border border-white/60 shadow-lg bg-white/40 mb-4">
             <div class="flex justify-between items-start mb-4">
                 <div class="flex items-center gap-3">
-                    <span
-                        class="px-3 py-1 bg-indigo-100 text-indigo-600 rounded-full text-[10px] font-black uppercase tracking-widest">{{ item.target_role }}</span>
+                    <span class="px-3 py-1 bg-indigo-100 text-indigo-600 rounded-full text-[10px] font-black uppercase tracking-widest">{{ item.target_role }}</span>
                     <span class="text-[11px] font-bold text-slate-400 italic">Sent {{ item.created_at|date:"M d, Y" }}</span>
                 </div>
                 <div
@@ -82,10 +81,8 @@
                     {% for resp in item.responses.all %}
                     <div class="p-4 bg-white/60 rounded-2xl border border-white/80">
                         <div class="flex justify-between items-start mb-1">
-                            <span class="font-bold text-slate-800 text-sm">{{ resp.sender.username }} ({{
-                                resp.sender.role }})</span>
-                            <span class="text-[10px] font-bold text-slate-400">{{ resp.created_at|timesince }}
-                                ago</span>
+                            <span class="font-bold text-slate-800 text-sm">{{ resp.sender.username }} ({{ resp.sender.role }})</span>
+                            <span class="text-[10px] font-bold text-slate-400">{{ resp.created_at|timesince }} ago</span>
                         </div>
                         <p class="text-sm text-slate-600">{{ resp.message }}</p>
                     </div>
@@ -167,8 +164,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>{{ item.created_at|date:"M d, Y" }}</span>
-                            <span class="flex items-center gap-1 uppercase tracking-tighter">By {{
-                                item.created_by.username }}</span>
+                            <span class="flex items-center gap-1 uppercase tracking-tighter">By {{ item.created_by.username }}</span>
                         </div>
                         <button
                             onclick="document.getElementById('reply-form-{{ item.id }}').classList.toggle('hidden'); event.stopPropagation();"
@@ -215,12 +211,9 @@
                 </div>
                 <div class="flex-grow">
                     <div class="flex items-center gap-2 mb-1">
-                        <span
-                            class="text-[9px] font-black {% if not item.is_read %} text-emerald-600 bg-emerald-50 {% else %} text-slate-400 bg-slate-50 {% endif %} uppercase tracking-widest px-2 py-0.5 rounded-md">{{
-                            item.category }}</span>
+                        <span class="text-[9px] font-black {% if not item.is_read %} text-emerald-600 bg-emerald-50 {% else %} text-slate-400 bg-slate-50 {% endif %} uppercase tracking-widest px-2 py-0.5 rounded-md">{{ item.category }}</span>
                         <span class="w-1 h-1 rounded-full bg-slate-300"></span>
-                        <span class="text-[10px] font-bold text-slate-400 italic">{{ item.created_at|timesince }}
-                            ago</span>
+                        <span class="text-[10px] font-bold text-slate-400 italic">{{ item.created_at|timesince }} ago</span>
                         {% if not item.is_read %}
                         <span
                             class="px-2 py-0.5 bg-emerald-500 text-white rounded-md text-[9px] font-black animate-pulse">NEW</span>

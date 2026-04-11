@@ -1,0 +1,763 @@
+diff --git a/academics/urls.py b/academics/urls.py
+index 9aa7606..3721f1d 100644
+--- a/academics/urls.py
++++ b/academics/urls.py
+@@ -4,6 +4,7 @@ from . import views
+ app_name = 'academics'
+ 
+ urlpatterns = [
++    path('', views.index, name='index'),
+     # Sessions
+     path('sessions/', views.SessionListView.as_view(), name='session_list'),
+     path('sessions/add/', views.SessionCreateView.as_view(), name='session_add'),
+diff --git a/academics/views.py b/academics/views.py
+index b7865ff..46a464b 100644
+--- a/academics/views.py
++++ b/academics/views.py
+@@ -3,6 +3,7 @@ from django.urls import reverse_lazy
+ from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+ from django.contrib import messages
++from django.contrib.auth.decorators import login_required
+ 
+ from .models import AcademicSession, ClassLevel, Section, Subject, TeacherAssignment
+ from .forms import AcademicSessionForm, ClassLevelForm, SectionForm, SubjectForm, TeacherAssignmentForm
+@@ -11,6 +12,16 @@ class AdminRequiredMixin(UserPassesTestMixin):
+     def test_func(self):
+         return self.request.user.is_authenticated and self.request.user.role == 'ADMIN'
+ 
++from django.shortcuts import render, redirect
++
++def index(request):
++    if not request.user.is_authenticated or request.user.role != 'ADMIN':
++        messages.error(request, 'You are not authorized to visit this page.')
++        if request.user.is_authenticated:
++            return redirect('accounts:dashboard')
++        return redirect('school_index')
++    return render(request, 'academics/index.html')
++
+ # ===================== SESSIONS =====================
+ class SessionListView(LoginRequiredMixin, AdminRequiredMixin, ListView):
+     model = AcademicSession
+diff --git a/ai_assistant/urls.py b/ai_assistant/urls.py
+index 4e657f6..c201ecd 100644
+--- a/ai_assistant/urls.py
++++ b/ai_assistant/urls.py
+@@ -1,6 +1,8 @@
+ from django.urls import path
++from . import views
+ 
+ app_name = 'ai_assistant'
+ 
+ urlpatterns = [
++    path('', views.index, name='index'),
+ ]
+\ No newline at end of file
+diff --git a/ai_assistant/views.py b/ai_assistant/views.py
+index 91ea44a..f68515e 100644
+--- a/ai_assistant/views.py
++++ b/ai_assistant/views.py
+@@ -1,3 +1,10 @@
+-from django.shortcuts import render
++from django.contrib import messages
++from django.shortcuts import render, redirect
+ 
+-# Create your views here.
++def index(request):
++    if not request.user.is_authenticated or request.user.role != 'ADMIN':
++        messages.error(request, "You are not authorized to visit the AI Assistant page.")
++        if request.user.is_authenticated:
++            return redirect('accounts:dashboard')
++        return redirect('school_index')
++    return render(request, 'ai_assistant/index.html')
+diff --git a/attendance/urls.py b/attendance/urls.py
+index 77df8ab..8d35350 100644
+--- a/attendance/urls.py
++++ b/attendance/urls.py
+@@ -4,6 +4,7 @@ from . import views
+ app_name = 'attendance'
+ 
+ urlpatterns = [
++    path('', views.index, name='index'),
+     path('teachers/', views.TeacherAttendanceListView.as_view(), name='teacher_attendance_list'),
+     path('teachers/add/', views.TeacherAttendanceCreateView.as_view(), name='teacher_attendance_add'),
+     path('teachers/<int:pk>/edit/', views.TeacherAttendanceUpdateView.as_view(), name='teacher_attendance_edit'),
+diff --git a/attendance/views.py b/attendance/views.py
+index 897b79d..c77dffb 100644
+--- a/attendance/views.py
++++ b/attendance/views.py
+@@ -2,6 +2,8 @@ from django.urls import reverse_lazy
+ from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+ from django.contrib import messages
++from django.contrib.auth.decorators import login_required
++from django.shortcuts import render
+ from .models import TeacherAttendance, StudentAttendance, LeaveRequest
+ from .forms import TeacherAttendanceForm, StudentAttendanceForm, LeaveRequestForm
+ 
+@@ -9,6 +11,16 @@ class AdminRequiredMixin(UserPassesTestMixin):
+     def test_func(self):
+         return self.request.user.is_authenticated and self.request.user.role == 'ADMIN'
+ 
++from django.shortcuts import render, redirect
++
++def index(request):
++    if not request.user.is_authenticated or request.user.role != 'ADMIN':
++        messages.error(request, 'You are not authorized to visit this page.')
++        if request.user.is_authenticated:
++            return redirect('accounts:dashboard')
++        return redirect('school_index')
++    return render(request, 'attendance/index.html')
++
+ class GenericDeleteMixin:
+     template_name = 'shared/confirm_delete.html'
+     def get_context_data(self, **kwargs):
+diff --git a/certificates/urls.py b/certificates/urls.py
+index 5a90f3a..da1f017 100644
+--- a/certificates/urls.py
++++ b/certificates/urls.py
+@@ -4,6 +4,7 @@ from . import views
+ app_name = 'certificates'
+ 
+ urlpatterns = [
++    path('', views.index, name='index'),
+     path('directory/', views.CertificateListView.as_view(), name='certificate_list'),
+     path('generate/', views.CertificateCreateView.as_view(), name='certificate_add'),
+     path('<int:pk>/edit/', views.CertificateUpdateView.as_view(), name='certificate_edit'),
+diff --git a/certificates/views.py b/certificates/views.py
+index f9e1c71..2dc60a4 100644
+--- a/certificates/views.py
++++ b/certificates/views.py
+@@ -2,6 +2,8 @@ from django.urls import reverse_lazy
+ from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+ from django.contrib import messages
++from django.contrib.auth.decorators import login_required
++from django.shortcuts import render
+ from .models import Certificate
+ from .forms import CertificateForm
+ 
+@@ -9,6 +11,16 @@ class AdminRequiredMixin(UserPassesTestMixin):
+     def test_func(self):
+         return self.request.user.is_authenticated and self.request.user.role == 'ADMIN'
+ 
++from django.shortcuts import render, redirect
++
++def index(request):
++    if not request.user.is_authenticated or request.user.role != 'ADMIN':
++        messages.error(request, 'You are not authorized to visit this page.')
++        if request.user.is_authenticated:
++            return redirect('accounts:dashboard')
++        return redirect('school_index')
++    return render(request, 'certificates/index.html')
++
+ class GenericDeleteMixin:
+     template_name = 'shared/confirm_delete.html'
+     def get_context_data(self, **kwargs):
+diff --git a/core/urls.py b/core/urls.py
+index 803399f..da2876a 100644
+--- a/core/urls.py
++++ b/core/urls.py
+@@ -1,5 +1,8 @@
+ from django.urls import path
++from . import views
+ 
+ app_name = 'core'
+ 
+-urlpatterns = []
+\ No newline at end of file
++urlpatterns = [
++    path('settings/', views.school_settings, name='school_settings'),
++]
+\ No newline at end of file
+diff --git a/core/views.py b/core/views.py
+index 91ea44a..349f8f0 100644
+--- a/core/views.py
++++ b/core/views.py
+@@ -1,3 +1,29 @@
+-from django.shortcuts import render
++from django.shortcuts import render, redirect
++from django.contrib.auth.decorators import login_required, user_passes_test
++from django.contrib import messages
++from .forms import SchoolIdentityForm
+ 
+-# Create your views here.
++def school_index(request):
++    if request.user.is_authenticated:
++        return redirect('accounts:dashboard')
++    
++    tenant = getattr(request, 'tenant', None)
++    return render(request, 'core/school_landing.html', {'school': tenant})
++
++def is_admin(user):
++    return user.is_authenticated and user.role == 'ADMIN'
++
++@login_required
++@user_passes_test(is_admin)
++def school_settings(request):
++    tenant = request.tenant
++    if request.method == 'POST':
++        form = SchoolIdentityForm(request.POST, request.FILES, instance=tenant)
++        if form.is_valid():
++            form.save()
++            messages.success(request, 'School identity updated successfully!')
++            return redirect('core:school_settings')
++    else:
++        form = SchoolIdentityForm(instance=tenant)
++        
++    return render(request, 'core/school_settings.html', {'form': form, 'title': 'School Identity Settings'})
+diff --git a/fees/urls.py b/fees/urls.py
+index d4ffb38..04602aa 100644
+--- a/fees/urls.py
++++ b/fees/urls.py
+@@ -4,6 +4,7 @@ from . import views
+ app_name = 'fees'
+ 
+ urlpatterns = [
++    path('', views.index, name='index'),
+     path('structures/', views.FeeStructureListView.as_view(), name='fee_structure_list'),
+     path('structures/add/', views.FeeStructureCreateView.as_view(), name='fee_structure_add'),
+     path('structures/<int:pk>/edit/', views.FeeStructureUpdateView.as_view(), name='fee_structure_edit'),
+diff --git a/fees/views.py b/fees/views.py
+index b5a5101..d9a8a80 100644
+--- a/fees/views.py
++++ b/fees/views.py
+@@ -2,6 +2,8 @@ from django.urls import reverse_lazy
+ from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+ from django.contrib import messages
++from django.contrib.auth.decorators import login_required
++from django.shortcuts import render
+ from .models import FeeStructure, StudentFeePayment
+ from .forms import FeeStructureForm, StudentFeePaymentForm
+ 
+@@ -9,6 +11,16 @@ class AdminRequiredMixin(UserPassesTestMixin):
+     def test_func(self):
+         return self.request.user.is_authenticated and self.request.user.role == 'ADMIN'
+ 
++from django.shortcuts import render, redirect
++
++def index(request):
++    if not request.user.is_authenticated or request.user.role != 'ADMIN':
++        messages.error(request, 'You are not authorized to visit this page.')
++        if request.user.is_authenticated:
++            return redirect('accounts:dashboard')
++        return redirect('school_index')
++    return render(request, 'fees/index.html')
++
+ class GenericDeleteMixin:
+     template_name = 'shared/confirm_delete.html'
+     def get_context_data(self, **kwargs):
+diff --git a/git_status.txt b/git_status.txt
+index c622456..0846b2a 100644
+--- a/git_status.txt
++++ b/git_status.txt
+@@ -1,46 +1,41 @@
+- M academics/forms.py
+- M academics/models.py
+  M academics/urls.py
+  M academics/views.py
+- M accounts/models.py
++ M ai_assistant/urls.py
++ M ai_assistant/views.py
+  M attendance/urls.py
+  M attendance/views.py
+  M certificates/urls.py
+  M certificates/views.py
+- M fees/forms.py
+- M fees/models.py
++ M core/urls.py
++ M core/views.py
+  M fees/urls.py
+  M fees/views.py
++ M git_status.txt
+  M grading/urls.py
+  M grading/views.py
+- M people/forms.py
++ M notifications/urls.py
+  M people/urls.py
+  M people/views.py
+  M school_management_system/settings.py
+  M school_management_system/urls.py
+- M static/css/style.css
++ M schools/forms.py
++ M schools/models.py
++ M schools/views.py
+  M templates/base.html
+- M templates/people/parent_form.html
+- M templates/people/parent_list.html
+- M templates/people/student_form.html
+- M templates/people/student_list.html
+- M templates/people/teacher_form.html
+- M templates/people/teacher_list.html
+-?? academics/migrations/0002_teacherassignment.py
+-?? accounts/migrations/0002_user_profile_picture.py
+-?? fees/migrations/0002_studentfeepayment_academic_session_and_more.py
+-?? git_status.txt
+-?? implementation_plan.md
+-?? schools/migrations/0003_alter_school_trial_ends_at.py
+-?? status.txt
+-?? templates/academics/assignment_list.html
+-?? templates/academics/confirm_delete.html
+-?? templates/certificates/
+-?? templates/fees/
+-?? templates/grading/
+-?? templates/people/confirm_delete.html
+-?? templates/people/parent_detail.html
+-?? templates/people/profile_edit.html
+-?? templates/people/student_detail.html
+-?? templates/people/teacher_detail.html
+-?? templates/shared/
++ M templates/notifications/inbox.html
++?? contact/
++?? core/forms.py
++?? git_diff.txt
++?? manual_testing.md
++?? notification_task
++?? patch_views.py
++?? schools/migrations/0004_school_about_text_school_logo_school_mission_and_more.py
++?? schools/migrations/0005_alter_school_trial_ends_at.py
++?? templates/academics/index.html
++?? templates/ai_assistant/
++?? templates/attendance/index.html
++?? templates/certificates/index.html
++?? templates/core/
++?? templates/fees/index.html
++?? templates/grading/index.html
++?? templates/people/index.html
+diff --git a/grading/urls.py b/grading/urls.py
+index 899928d..6dc0a0b 100644
+--- a/grading/urls.py
++++ b/grading/urls.py
+@@ -4,6 +4,7 @@ from . import views
+ app_name = 'grading'
+ 
+ urlpatterns = [
++    path('', views.index, name='index'),
+     path('marks/', views.MarkListView.as_view(), name='mark_list'),
+     path('marks/add/', views.MarkCreateView.as_view(), name='mark_add'),
+     path('marks/<int:pk>/edit/', views.MarkUpdateView.as_view(), name='mark_edit'),
+diff --git a/grading/views.py b/grading/views.py
+index 43ee2ef..f8e9077 100644
+--- a/grading/views.py
++++ b/grading/views.py
+@@ -2,6 +2,8 @@ from django.urls import reverse_lazy
+ from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+ from django.contrib import messages
++from django.contrib.auth.decorators import login_required
++from django.shortcuts import render
+ from .models import Mark, FinalReport
+ from .forms import MarkForm, FinalReportForm
+ 
+@@ -9,6 +11,16 @@ class AdminRequiredMixin(UserPassesTestMixin):
+     def test_func(self):
+         return self.request.user.is_authenticated and self.request.user.role == 'ADMIN'
+ 
++from django.shortcuts import render, redirect
++
++def index(request):
++    if not request.user.is_authenticated or request.user.role != 'ADMIN':
++        messages.error(request, 'You are not authorized to visit this page.')
++        if request.user.is_authenticated:
++            return redirect('accounts:dashboard')
++        return redirect('school_index')
++    return render(request, 'grading/index.html')
++
+ class GenericDeleteMixin:
+     template_name = 'shared/confirm_delete.html'
+     def get_context_data(self, **kwargs):
+diff --git a/notifications/urls.py b/notifications/urls.py
+index 5ae2fda..acaef8f 100644
+--- a/notifications/urls.py
++++ b/notifications/urls.py
+@@ -4,6 +4,7 @@ from . import views
+ app_name = 'notifications'
+ 
+ urlpatterns = [
++    path('', views.NotificationListView.as_view(), name='index'),
+     path('inbox/', views.NotificationListView.as_view(), name='inbox'),
+     path('broadcast/add/', views.BroadcastCreateView.as_view(), name='broadcast_add'),
+     path('unread-count/', views.UnreadCountView.as_view(), name='unread_count'),
+diff --git a/people/urls.py b/people/urls.py
+index 741ea92..33fefeb 100644
+--- a/people/urls.py
++++ b/people/urls.py
+@@ -4,6 +4,7 @@ from . import views
+ app_name = 'people'
+ 
+ urlpatterns = [
++    path('', views.index, name='index'),
+     # Teachers
+     path('teachers/', views.TeacherListView.as_view(), name='teacher_list'),
+     path('teachers/add/', views.TeacherCreateView.as_view(), name='teacher_add'),
+diff --git a/people/views.py b/people/views.py
+index 8bbb5ce..57e55b2 100644
+--- a/people/views.py
++++ b/people/views.py
+@@ -4,6 +4,7 @@ from django.urls import reverse_lazy
+ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+ from django.db import transaction
+ from django.contrib import messages
++from django.contrib.auth.decorators import login_required
+ import random
+ import string
+ 
+@@ -19,6 +20,17 @@ from .forms import (
+ def generate_random_password():
+     return ''.join(random.choices(string.ascii_letters + string.digits, k=8))
+ 
++from django.shortcuts import render, redirect
++
++def index(request):
++    if not request.user.is_authenticated or request.user.role != 'ADMIN':
++        from django.contrib import messages
++        messages.error(request, "You are not authorized to visit this page.")
++        if request.user.is_authenticated:
++            return redirect('accounts:dashboard')
++        return redirect('school_index')
++    return render(request, 'people/index.html')
++
+ 
+ class AdminRequiredMixin(UserPassesTestMixin):
+     def test_func(self):
+diff --git a/school_management_system/settings.py b/school_management_system/settings.py
+index bbb4941..31bf311 100644
+--- a/school_management_system/settings.py
++++ b/school_management_system/settings.py
+@@ -34,6 +34,8 @@ DEBUG = env('DEBUG')
+ 
+ ALLOWED_HOSTS = ['*']
+ 
++CSRF_TRUSTED_ORIGINS = ['https://judgementally-aerogenic-kristina.ngrok-free.dev']
++
+ 
+ # Application definition
+ 
+@@ -63,9 +65,11 @@ TENANT_APPS = [
+     'ai_assistant',
+     'certificates',
+     'notifications',
++    'core',
++    'contact',
+ ]
+ 
+-INSTALLED_APPS = SHARED_APPS + [app for app in TENANT_APPS if app not in SHARED_APPS]
++INSTALLED_APPS = list(set(SHARED_APPS + TENANT_APPS))
+ 
+ # 2. Tenant Configuration
+ TENANT_MODEL = "schools.School"          # ← Your tenant model
+diff --git a/school_management_system/urls.py b/school_management_system/urls.py
+index 8fbfe8c..6c28fd6 100644
+--- a/school_management_system/urls.py
++++ b/school_management_system/urls.py
+@@ -8,8 +8,10 @@ from django.contrib import admin
+ from django.urls import path, include
+ from django.conf import settings
+ from django.conf.urls.static import static
++from core import views as core_views
+ 
+ urlpatterns = [
++    path('', core_views.school_index, name='school_index'),
+     # ====================== ADMIN ======================
+     path('admin/', admin.site.urls),                    # Each school gets its own admin
+ 
+@@ -40,6 +42,12 @@ urlpatterns = [
+     # ====================== NOTIFICATIONS ======================
+     path('notifications/', include('notifications.urls', namespace='notifications')),
+ 
++    # ====================== CORE SETTINGS ======================
++    path('core/', include('core.urls', namespace='core')),
++    
++    # ====================== CONTACT ======================
++    path('contact/', include('contact.urls', namespace='contact')),
++
+     # ====================== API (if you plan to add DRF later) ======================
+     # path('api/', include('api.urls', namespace='api')),
+ ]
+diff --git a/schools/forms.py b/schools/forms.py
+index d08bf5d..abcf754 100644
+--- a/schools/forms.py
++++ b/schools/forms.py
+@@ -18,6 +18,8 @@ class SchoolSignupForm(forms.Form):
+     email = forms.EmailField(label="Admin Email")
+     password = forms.CharField(widget=forms.PasswordInput(), label="Password")
+     password_confirm = forms.CharField(widget=forms.PasswordInput(), label="Confirm Password")
++    tagline = forms.CharField(max_length=255, required=False, label="School Tagline", help_text="e.g. Empowering the Leaders of Tomorrow")
++    about_text = forms.CharField(widget=forms.Textarea, required=False, label="About School", help_text="A brief description of your school")
+ 
+     def clean(self):
+         cleaned_data = super().clean()
+diff --git a/schools/models.py b/schools/models.py
+index 0068db9..263feb5 100644
+--- a/schools/models.py
++++ b/schools/models.py
+@@ -13,6 +13,13 @@ class School(TenantMixin):
+     contact_phone = models.CharField(max_length=20, blank=True)
+     created_at = models.DateTimeField(auto_now_add=True)
+ 
++    # Landing Page Identity Fields
++    tagline = models.CharField(max_length=255, blank=True, help_text="A short, catchy phrase about the school.")
++    about_text = models.TextField(blank=True, help_text="Detailed 'About Us' description.")
++    mission = models.TextField(blank=True, help_text="School's mission statement.")
++    vision = models.TextField(blank=True, help_text="School's vision statement.")
++    logo = models.ImageField(upload_to='school_logos/', blank=True, null=True)
++
+     # Subscription & Trial
+     is_active = models.BooleanField(default=True)
+     trial_ends_at = models.DateTimeField(
+diff --git a/schools/views.py b/schools/views.py
+index 7c4bbe6..1ee7bb9 100644
+--- a/schools/views.py
++++ b/schools/views.py
+@@ -20,6 +20,8 @@ def school_signup(request):
+             slug = form.cleaned_data['slug']
+             email = form.cleaned_data['email']
+             password = form.cleaned_data['password']
++            tagline = form.cleaned_data.get('tagline', '')
++            about_text = form.cleaned_data.get('about_text', '')
+ 
+             # Check if slug already exists
+             if School.objects.filter(schema_name=slug).exists():
+@@ -32,6 +34,8 @@ def school_signup(request):
+                     name=school_name,
+                     slug=slug,
+                     contact_email=email,
++                    tagline=tagline,
++                    about_text=about_text,
+                     trial_ends_at=timezone.now() + timedelta(days=2),
+                     is_active=True,
+                 )
+diff --git a/templates/base.html b/templates/base.html
+index d6d8d20..839aee8 100644
+--- a/templates/base.html
++++ b/templates/base.html
+@@ -191,8 +191,14 @@
+             <div class="space-y-4 mt-auto pt-6">
+                 <a href="{% url 'accounts:password_change' %}" class="nav-link text-sm" style="text-decoration:none;">
+                     <svg class="w-5 h-5 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path></svg>
+-                    Settings
++                    Profile Settings
+                 </a>
++                {% if user.role == 'ADMIN' %}
++                <a href="{% url 'core:school_settings' %}" class="nav-link text-sm" style="text-decoration:none;">
++                    <svg class="w-5 h-5 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
++                    School Identity
++                </a>
++                {% endif %}
+                 <div class="glass-panel p-4 rounded-2xl flex items-center justify-between">
+                     <div class="flex items-center gap-3">
+                         {% if user.profile_picture %}
+@@ -214,7 +220,7 @@
+     {% endif %}
+ 
+     <!-- UNIFIED MAIN CONTENT wrapper -->
+-    <main class="w-full flex flex-col min-h-screen {% if user.is_authenticated %} main-content-shifted px-4 sm:px-6 lg:px-10 max-w-full {% else %} mx-auto p-4 md:p-8 max-w-6xl items-center {% endif %} page-transition">
++    <main class="w-full flex flex-col min-h-screen {% if user.is_authenticated %} main-content-shifted px-4 sm:px-6 lg:px-10 max-w-full {% else %} {% block guest_main_classes %}mx-auto p-4 md:p-8 max-w-6xl items-center{% endblock %} {% endif %} page-transition">
+ 
+         {% if user.is_authenticated %}
+             <!-- Mobile/Tablet Header with Hamburger -->
+@@ -233,6 +239,7 @@
+             </div>
+         {% endif %}
+ 
++        {% block header %}
+         {% if not user.is_authenticated %}
+         <!-- Header for Guest -->
+         <header class="flex justify-center pt-8 pb-8 w-full animate-slide-up">
+@@ -246,25 +253,20 @@
+             </a>
+         </header>
+         {% endif %}
++        {% endblock %}
++
+ 
+-        {% if messages %}
+-        <div class="w-full {% if not user.is_authenticated %} max-w-md {% endif %} mb-8 space-y-3 z-50">
+-            {% for message in messages %}
+-            <div class="glass-panel p-4 rounded-xl text-slate-800 flex items-center shadow-sm animate-slide-up border-l-4 border-indigo-500">
+-                {{ message }}
+-            </div>
+-            {% endfor %}
+-        </div>
+-        {% endif %}
+ 
+         <div class="flex-grow w-full animate-slide-up flex flex-col {% if not user.is_authenticated %} items-center {% endif %} justify-center">
+             {% block content %}
+             {% endblock %}
+         </div>
+ 
++        {% block footer %}
+         <footer class="mt-16 pt-6 border-t border-slate-300/30 text-center text-slate-500 text-sm pb-8 animate-slide-up w-full">
+             &copy; {% now "Y" %} SchoolOS Management System. All rights reserved.
+         </footer>
++        {% endblock %}
+     </main>
+ 
+     <!-- Global Form Validation Modal Native to System -->
+@@ -306,6 +308,113 @@
+     </div>
+     {% endif %}
+ 
++    {% if messages %}
++    <div id="floating-toasts" class="fixed top-24 right-6 z-[999] flex flex-col gap-3 w-full max-w-sm pointer-events-none">
++        {% for message in messages %}
++        <div class="toast-item pointer-events-auto relative glass-panel p-4 rounded-xl text-slate-800 flex items-start gap-3 shadow-2xl border-l-4 {% if message.tags == 'error' %}border-rose-500{% else %}border-indigo-500{% endif %} overflow-hidden cursor-pointer" 
++             style="animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;">
++            <div class="flex-grow pt-0.5 font-medium text-sm">{{ message }}</div>
++            <button class="toast-close flex-shrink-0 text-slate-400 hover:text-slate-600 transition-colors p-1" aria-label="Close">
++                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
++            </button>
++        </div>
++        {% endfor %}
++    </div>
++
++    <style>
++        @keyframes slideInRight {
++            from { transform: translateX(120%); opacity: 0; }
++            to { transform: translateX(0); opacity: 1; }
++        }
++        @keyframes fadeOutUp {
++            from { transform: translateY(0) scale(1); opacity: 1; }
++            to { transform: translateY(-20px) scale(0.9); opacity: 0; }
++        }
++        .toast-leaving {
++            animation: fadeOutUp 0.3s ease forwards !important;
++        }
++        .butterfly-particle {
++            position: absolute;
++            width: 8px;
++            height: 8px;
++            background: linear-gradient(135deg, #8b5cf6, #ec4899);
++            border-radius: 50% 0 50% 0; /* slight butterfly wing shape */
++            pointer-events: none;
++            z-index: 1000;
++        }
++        @keyframes flutterAway {
++            0% { opacity: 1; transform: translate(0, 0) scale(1) rotate(0deg); }
++            100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0) rotate(var(--rot)); }
++        }
++    </style>
++    
++    <script>
++        document.addEventListener('DOMContentLoaded', () => {
++            const toasts = document.querySelectorAll('.toast-item');
++            
++            toasts.forEach(toast => {
++                let dismissTimeout;
++                let shattered = false;
++                
++                const removeToast = () => {
++                    if (shattered) return;
++                    toast.classList.add('toast-leaving');
++                    setTimeout(() => toast.remove(), 300);
++                };
++
++                const shatterToast = (e) => {
++                    if (shattered) return;
++                    shattered = true;
++                    clearTimeout(dismissTimeout);
++                    
++                    const rect = toast.getBoundingClientRect();
++                    // Spawn particles
++                    for(let i=0; i<25; i++) {
++                        const p = document.createElement('div');
++                        p.className = 'butterfly-particle';
++                        
++                        // Start point near click
++                        const x = e.clientX - rect.left;
++                        const y = e.clientY - rect.top;
++                        p.style.left = x + 'px';
++                        p.style.top = y + 'px';
++                        
++                        // Trajectories spreading out and floating up
++                        const angle = Math.random() * Math.PI * 2;
++                        const velocity = 40 + Math.random() * 80;
++                        const tx = Math.cos(angle) * velocity;
++                        const ty = Math.sin(angle) * velocity - 40; 
++                        const rot = (Math.random() - 0.5) * 500;
++                        
++                        p.style.setProperty('--tx', `${tx}px`);
++                        p.style.setProperty('--ty', `${ty}px`);
++                        p.style.setProperty('--rot', `${rot}deg`);
++                        
++                        p.style.animation = `flutterAway ${0.5 + Math.random()*0.5}s cubic-bezier(0.25, 1, 0.5, 1) forwards`;
++                        toast.appendChild(p);
++                    }
++                    
++                    // Hide main content
++                    Array.from(toast.children).forEach(c => {
++                        if (!c.classList.contains('butterfly-particle')) c.style.opacity = '0';
++                    });
++                    toast.style.background = 'transparent';
++                    toast.style.boxShadow = 'none';
++                    toast.style.border = 'none';
++                    
++                    setTimeout(() => toast.remove(), 1000);
++                };
++
++                // Click to shatter
++                toast.addEventListener('click', shatterToast);
++
++                // Auto dismiss
++                dismissTimeout = setTimeout(removeToast, 5000);
++            });
++        });
++    </script>
++    {% endif %}
++
+     <!-- External Custom JS -->
+     <script src="{% static 'js/main.js' %}"></script>
+ </body>
+diff --git a/templates/notifications/inbox.html b/templates/notifications/inbox.html
+index 53516a8..5c1c9dd 100644
+--- a/templates/notifications/inbox.html
++++ b/templates/notifications/inbox.html
+@@ -50,8 +50,7 @@
+         <div class="glass-panel p-6 rounded-3xl border border-white/60 shadow-lg bg-white/40 mb-4">
+             <div class="flex justify-between items-start mb-4">
+                 <div class="flex items-center gap-3">
+-                    <span
+-                        class="px-3 py-1 bg-indigo-100 text-indigo-600 rounded-full text-[10px] font-black uppercase tracking-widest">{{ item.target_role }}</span>
++                    <span class="px-3 py-1 bg-indigo-100 text-indigo-600 rounded-full text-[10px] font-black uppercase tracking-widest">{{ item.target_role }}</span>
+                     <span class="text-[11px] font-bold text-slate-400 italic">Sent {{ item.created_at|date:"M d, Y" }}</span>
+                 </div>
+                 <div
+@@ -82,10 +81,8 @@
+                     {% for resp in item.responses.all %}
+                     <div class="p-4 bg-white/60 rounded-2xl border border-white/80">
+                         <div class="flex justify-between items-start mb-1">
+-                            <span class="font-bold text-slate-800 text-sm">{{ resp.sender.username }} ({{
+-                                resp.sender.role }})</span>
+-                            <span class="text-[10px] font-bold text-slate-400">{{ resp.created_at|timesince }}
+-                                ago</span>
++                            <span class="font-bold text-slate-800 text-sm">{{ resp.sender.username }} ({{ resp.sender.role }})</span>
++                            <span class="text-[10px] font-bold text-slate-400">{{ resp.created_at|timesince }} ago</span>
+                         </div>
+                         <p class="text-sm text-slate-600">{{ resp.message }}</p>
+                     </div>
+@@ -167,8 +164,7 @@
+                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                         d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                 </svg>{{ item.created_at|date:"M d, Y" }}</span>
+-                            <span class="flex items-center gap-1 uppercase tracking-tighter">By {{
+-                                item.created_by.username }}</span>
++                            <span class="flex items-center gap-1 uppercase tracking-tighter">By {{ item.created_by.username }}</span>
+                         </div>
+                         <button
+                             onclick="document.getElementById('reply-form-{{ item.id }}').classList.toggle('hidden'); event.stopPropagation();"
+@@ -215,12 +211,9 @@
+                 </div>
+                 <div class="flex-grow">
+                     <div class="flex items-center gap-2 mb-1">
+-                        <span
+-                            class="text-[9px] font-black {% if not item.is_read %} text-emerald-600 bg-emerald-50 {% else %} text-slate-400 bg-slate-50 {% endif %} uppercase tracking-widest px-2 py-0.5 rounded-md">{{
+-                            item.category }}</span>
++                        <span class="text-[9px] font-black {% if not item.is_read %} text-emerald-600 bg-emerald-50 {% else %} text-slate-400 bg-slate-50 {% endif %} uppercase tracking-widest px-2 py-0.5 rounded-md">{{ item.category }}</span>
+                         <span class="w-1 h-1 rounded-full bg-slate-300"></span>
+-                        <span class="text-[10px] font-bold text-slate-400 italic">{{ item.created_at|timesince }}
+-                            ago</span>
++                        <span class="text-[10px] font-bold text-slate-400 italic">{{ item.created_at|timesince }} ago</span>
+                         {% if not item.is_read %}
+                         <span
+                             class="px-2 py-0.5 bg-emerald-500 text-white rounded-md text-[9px] font-black animate-pulse">NEW</span>

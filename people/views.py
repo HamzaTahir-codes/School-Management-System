@@ -4,6 +4,7 @@ from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db import transaction
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 import random
 import string
 
@@ -18,6 +19,17 @@ from .forms import (
 
 def generate_random_password():
     return ''.join(random.choices(string.ascii_letters + string.digits, k=8))
+
+from django.shortcuts import render, redirect
+
+def index(request):
+    if not request.user.is_authenticated or request.user.role != 'ADMIN':
+        from django.contrib import messages
+        messages.error(request, "You are not authorized to visit this page.")
+        if request.user.is_authenticated:
+            return redirect('accounts:dashboard')
+        return redirect('school_index')
+    return render(request, 'people/index.html')
 
 
 class AdminRequiredMixin(UserPassesTestMixin):

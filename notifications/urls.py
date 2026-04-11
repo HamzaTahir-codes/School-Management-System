@@ -4,6 +4,7 @@ from . import views
 app_name = 'notifications'
 
 urlpatterns = [
+    path('', views.NotificationListView.as_view(), name='index'),
     path('inbox/', views.NotificationListView.as_view(), name='inbox'),
     path('broadcast/add/', views.BroadcastCreateView.as_view(), name='broadcast_add'),
     path('unread-count/', views.UnreadCountView.as_view(), name='unread_count'),

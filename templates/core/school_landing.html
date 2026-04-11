@@ -1,0 +1,361 @@
+{% extends 'base.html' %}
+{% block title %}{{ school.name }} - Welcome{% endblock %}
+
+{% block header %}
+<!-- Empty header block so base.html guest header doesn't render here -->
+{% endblock %}
+
+{% block footer %}
+<!-- Empty footer block, we will put the footer inside content -->
+{% endblock %}
+
+{% block guest_main_classes %}w-full{% endblock %}
+
+{% block content %}
+<!-- Beautiful Animations & Styles -->
+<style>
+    @keyframes fade-in-up {
+        0% { opacity: 0; transform: translateY(20px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    .stagger-1 { animation: fade-in-up 0.6s ease-out 0.1s both; }
+    .stagger-2 { animation: fade-in-up 0.6s ease-out 0.3s both; }
+    .stagger-3 { animation: fade-in-up 0.6s ease-out 0.5s both; }
+    .stagger-4 { animation: fade-in-up 0.6s ease-out 0.7s both; }
+    
+    .feature-card:hover { transform: translateY(-5px); }
+</style>
+
+<!-- Navbar -->
+<nav class="w-full absolute top-0 left-0 p-6 flex justify-between items-center z-50 max-w-7xl mx-auto right-0">
+    <div class="flex items-center gap-3">
+        {% if school.logo %}
+            <img src="{{ school.logo.url }}" alt="{{ school.name }} Logo" class="h-12 w-auto object-contain drop-shadow-md rounded-lg">
+        {% else %}
+            <div class="h-12 w-12 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-xl text-xl font-bold">
+                {{ school.name|slice:":1"|upper }}
+            </div>
+        {% endif %}
+        <span class="text-2xl font-extrabold tracking-tight text-slate-800">{{ school.name }}</span>
+    </div>
+    <div class="hidden md:flex gap-8 items-center text-slate-600 font-medium">
+        <a href="#about" class="hover:text-indigo-600 transition-colors">About Us</a>
+        <a href="#features" class="hover:text-indigo-600 transition-colors">Ecosystem</a>
+        <a href="#contact" class="hover:text-indigo-600 transition-colors">Contact</a>
+    </div>
+    <div>
+        <a href="{% url 'accounts:login' %}" class="px-6 py-2.5 bg-white/50 backdrop-blur-md border border-white text-indigo-700 font-bold rounded-xl shadow-sm hover:shadow-md hover:bg-white transition-all">Sign In</a>
+    </div>
+</nav>
+
+<div class="w-full overflow-x-hidden">
+
+    <!-- Hero Section -->
+    <div class="relative w-full min-h-[90vh] flex flex-col items-center justify-center pt-20 px-4 text-center overflow-hidden">
+        <div class="absolute top-1/4 -left-20 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-blob"></div>
+        <div class="absolute top-1/3 -right-20 w-80 h-80 bg-indigo-300 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-blob" style="animation-delay: 2s;"></div>
+        <div class="absolute -bottom-32 left-1/2 w-96 h-96 -translate-x-1/2 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-blob" style="animation-delay: 4s;"></div>
+
+        <div class="relative z-10 max-w-4xl mx-auto space-y-8">
+            <h1 class="text-6xl md:text-8xl font-black text-slate-800 tracking-tight leading-tight stagger-1">
+                {{ school.name }}
+            </h1>
+            <p class="text-xl md:text-3xl text-indigo-600 font-bold tracking-wide stagger-2">
+                {% if school.tagline %}
+                    {{ school.tagline }}
+                {% else %}
+                    Excellence in Education
+                {% endif %}
+            </p>
+            <div class="pt-8 flex flex-col sm:flex-row gap-4 justify-center items-center stagger-3">
+                <a href="#explore" class="px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl font-bold text-lg shadow-xl hover:shadow-indigo-500/30 hover:scale-105 transition-all flex items-center gap-2">
+                    Explore Campus
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Section -->
+    <div id="about" class="w-full bg-slate-50 py-24">
+        <div class="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+            <div class="space-y-6">
+                <div class="inline-block px-4 py-1.5 rounded-full bg-slate-200 text-slate-600 text-sm font-bold tracking-widest uppercase">About Us</div>
+                <h2 class="text-4xl md:text-5xl font-extrabold text-slate-800 leading-tight">Empowering the Next Generation</h2>
+                <p class="text-lg text-slate-500 leading-relaxed">
+                    {% if school.about_text %}
+                        {{ school.about_text }}
+                    {% else %}
+                        Welcome to our digital campus. A modern institution dedicated to fostering academic brilliance, creativity, and personal growth in every student. We provide an environment where innovation meets tradition.
+                    {% endif %}
+                </p>
+            </div>
+            <div class="relative">
+                <div class="absolute inset-0 bg-gradient-to-tr from-indigo-200 to-purple-200 rounded-3xl transform rotate-3 scale-105 opacity-50 blur-lg"></div>
+                <!-- Generic visual graphic -->
+                <div class="relative glass-card bg-white p-8 rounded-3xl border border-white shadow-2xl flex flex-col gap-4">
+                    <div class="h-48 w-full rounded-2xl bg-slate-100 flex items-center justify-center overflow-hidden relative">
+                         <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-purple-500/10"></div>
+                         <svg class="w-20 h-20 text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mission & Vision Section -->
+    {% if school.mission or school.vision %}
+    <div id="mission" class="w-full bg-slate-900 text-white py-24 px-4 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-indigo-500 via-slate-900 to-slate-900"></div>
+        <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 relative z-10">
+            {% if school.mission %}
+            <div class="space-y-6">
+                <div class="w-14 h-14 rounded-2xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center border border-indigo-500/30">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                </div>
+                <h3 class="text-2xl font-bold text-white tracking-widest">Our Mission</h3>
+                <p class="text-xl leading-relaxed text-slate-300 font-light italic">"{{ school.mission }}"</p>
+            </div>
+            {% endif %}
+            {% if school.vision %}
+            <div class="space-y-6">
+                 <div class="w-14 h-14 rounded-2xl bg-purple-500/20 text-purple-400 flex items-center justify-center border border-purple-500/30">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                </div>
+                <h3 class="text-2xl font-bold text-white tracking-widest">Our Vision</h3>
+                <p class="text-xl leading-relaxed text-slate-300 font-light italic">"{{ school.vision }}"</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Features/Ecosystem Section -->
+    <div id="features" class="w-full py-24 bg-white px-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <div class="inline-block px-4 py-1.5 rounded-full bg-slate-100 text-slate-600 text-sm font-bold tracking-widest uppercase mb-4">Ecosystem</div>
+                <h2 class="text-4xl md:text-5xl font-extrabold text-slate-800 mb-4">Discover Our Ecosystem</h2>
+                <p class="text-slate-500 text-lg max-w-2xl mx-auto">Integrated tools and teams to empower students, teachers, and parents.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Dedicated Staff -->
+                <div class="feature-card glass-card p-8 rounded-3xl border border-slate-100 transition-all duration-300 bg-slate-50 hover:bg-white hover:shadow-xl hover:shadow-slate-200">
+                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-purple-500 to-pink-500 flex items-center justify-center text-white mb-6 shadow-lg shadow-purple-500/30">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-slate-800 mb-3">Dedicated Staff</h3>
+                    <p class="text-slate-500 leading-relaxed">Learn from highly qualified professionals who are passionately dedicated to nurturing student success, well-being, and academic excellence.</p>
+                </div>
+
+                <!-- Dedicated AI -->
+                <div class="feature-card glass-card p-8 rounded-3xl border border-slate-100 transition-all duration-300 bg-slate-50 hover:bg-white hover:shadow-xl hover:shadow-slate-200">
+                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-500 to-emerald-400 flex items-center justify-center text-white mb-6 shadow-lg shadow-indigo-500/30">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-slate-800 mb-3">Dedicated AI Assistant</h3>
+                    <p class="text-slate-500 leading-relaxed">24/7 intelligent virtual assistance for students. Our proprietary AI helps with homework, clarifies complex queries, and accelerates learning.</p>
+                </div>
+
+                 <!-- Academics -->
+                 <div class="feature-card glass-card p-8 rounded-3xl border border-slate-100 transition-all duration-300 bg-slate-50 hover:bg-white hover:shadow-xl hover:shadow-slate-200">
+                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-500 to-cyan-400 flex items-center justify-center text-white mb-6 shadow-lg shadow-blue-500/30">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-slate-800 mb-3">Robust Curriculum</h3>
+                    <p class="text-slate-500 leading-relaxed">Comprehensive curriculum management, interactive assignments, transparent grading, and digitally minted certificates.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reviews Section -->
+    <div id="reviews" class="w-full bg-slate-50 py-24 px-4 overflow-hidden border-t border-slate-200/50">
+        <div class="max-w-7xl mx-auto text-center mb-16">
+            <h2 class="text-4xl font-extrabold text-slate-800 mb-4">What Our Community Says</h2>
+            <p class="text-slate-500 text-lg">Real experiences from parents, students, and educators.</p>
+        </div>
+        <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="glass-card bg-white p-8 rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/50 relative">
+                <div class="text-indigo-400 mb-4">
+                    <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"></path></svg>
+                </div>
+                <p class="text-slate-600 mb-6 font-medium italic">"The digital infrastructure combined with the brilliant staff has made this the perfect environment for my child to thrive academically."</p>
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-full bg-slate-200"></div>
+                    <div>
+                        <div class="font-bold text-slate-800">Sarah Jenkins</div>
+                        <div class="text-sm text-slate-500">Parent</div>
+                    </div>
+                </div>
+            </div>
+            
+             <div class="glass-card bg-white p-8 rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/50 relative">
+                <div class="text-indigo-400 mb-4">
+                    <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"></path></svg>
+                </div>
+                <p class="text-slate-600 mb-6 font-medium italic">"I love having access to the AI assistant for my homework. It explains things step-by-step and makes learning so much more fun."</p>
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-full bg-slate-200"></div>
+                    <div>
+                        <div class="font-bold text-slate-800">Michael T.</div>
+                        <div class="text-sm text-slate-500">Student</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card bg-white p-8 rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/50 relative">
+                 <div class="text-indigo-400 mb-4">
+                    <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"></path></svg>
+                </div>
+                <p class="text-slate-600 mb-6 font-medium italic">"As a teacher, the SchoolOS dashboard saves me hours every week on grading and attendance tracking. Incredible system."</p>
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-full bg-slate-200"></div>
+                    <div>
+                        <div class="font-bold text-slate-800">Dr. Emma Cole</div>
+                        <div class="text-sm text-slate-500">Faculty</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Section -->
+    <div id="contact" class="w-full py-24 bg-white px-4">
+        <div class="max-w-6xl mx-auto flex flex-col lg:flex-row gap-16">
+            <div class="lg:w-1/2 space-y-8">
+                <div>
+                    <h2 class="text-4xl font-extrabold text-slate-800 mb-4">Get In Touch</h2>
+                    <p class="text-slate-500 text-lg">Have questions? We'd love to hear from you. Fill out the form or reach out directly.</p>
+                </div>
+                
+                <div class="space-y-6 pt-4">
+                    {% if school.address %}
+                    <div class="flex items-start gap-4">
+                         <div class="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center text-slate-600 flex-shrink-0 border border-slate-200">
+                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                         </div>
+                         <div>
+                             <h4 class="font-bold text-slate-800">Campus Location</h4>
+                             <p class="text-slate-500">{{ school.address }}</p>
+                         </div>
+                    </div>
+                    {% endif %}
+
+                    {% if school.contact_email %}
+                    <div class="flex items-start gap-4">
+                         <div class="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center text-slate-600 flex-shrink-0 border border-slate-200">
+                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                         </div>
+                         <div>
+                             <h4 class="font-bold text-slate-800">Email Us</h4>
+                             <p class="text-slate-500"><a href="mailto:{{ school.contact_email }}" class="hover:text-indigo-600 transition-colors">{{ school.contact_email }}</a></p>
+                         </div>
+                    </div>
+                    {% endif %}
+
+                    {% if school.contact_phone %}
+                    <div class="flex items-start gap-4">
+                         <div class="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center text-slate-600 flex-shrink-0 border border-slate-200">
+                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                         </div>
+                         <div>
+                             <h4 class="font-bold text-slate-800">Call Us</h4>
+                             <p class="text-slate-500"><a href="tel:{{ school.contact_phone }}" class="hover:text-indigo-600 transition-colors">{{ school.contact_phone }}</a></p>
+                         </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="lg:w-1/2" id="contact-form-container">
+                <form class="glass-card bg-white p-8 rounded-3xl border border-slate-200 shadow-xl relative" 
+                      hx-post="{% url 'contact:submit' %}" 
+                      hx-target="#contact-form-container"
+                      hx-swap="outerHTML">
+                    {% csrf_token %}
+                    <div class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-2">First Name</label>
+                                <input type="text" name="first_name" class="w-full rounded-xl border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-2">Last Name</label>
+                                <input type="text" name="last_name" class="w-full rounded-xl border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Email Address</label>
+                            <input type="email" name="email" class="w-full rounded-xl border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Message</label>
+                            <textarea name="message" class="w-full rounded-xl border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="w-full py-3.5 bg-slate-800 text-white font-bold rounded-xl hover:bg-slate-700 transition shadow-lg active:scale-95 relative overflow-hidden group">
+                            <span class="relative z-10 flex items-center justify-center gap-2">
+                                Send Message
+                                <svg class="w-5 h-5 text-indigo-300 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                            </span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mega Footer Section -->
+    <footer class="w-full bg-slate-900 border-t border-slate-800 pt-16 pb-8 px-4 text-slate-400">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+            <div class="space-y-4">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="h-10 w-10 rounded-xl bg-slate-800 flex items-center justify-center text-white font-bold">
+                        {{ school.name|slice:":1"|upper }}
+                    </div>
+                    <span class="text-xl font-bold text-white">{{ school.name }}</span>
+                </div>
+                <p class="text-sm text-slate-500">Empowering the next generation with modern education and cutting-edge technology.</p>
+            </div>
+            
+            <div>
+                <h4 class="text-white font-bold mb-6">Explore</h4>
+                <ul class="space-y-3 text-sm">
+                    <li><a href="#about" class="hover:text-indigo-400 transition-colors">About Us</a></li>
+                    <li><a href="#mission" class="hover:text-indigo-400 transition-colors">Mission & Vision</a></li>
+                    <li><a href="#features" class="hover:text-indigo-400 transition-colors">Ecosystem</a></li>
+                    <li><a href="#reviews" class="hover:text-indigo-400 transition-colors">Community Reviews</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="text-white font-bold mb-6">Key Sections</h4>
+                <ul class="space-y-3 text-sm">
+                    <li><a href="#features" class="hover:text-indigo-400 transition-colors">Dedicated Staff</a></li>
+                    <li><a href="#features" class="hover:text-indigo-400 transition-colors">Dedicated AI Assistant</a></li>
+                    <li><a href="#features" class="hover:text-indigo-400 transition-colors">Academics</a></li>
+                    <li><a href="{% url 'accounts:login' %}" class="hover:text-indigo-400 transition-colors">Portal Login</a></li>
+                </ul>
+            </div>
+
+             <div>
+                <h4 class="text-white font-bold mb-6">Contact Us</h4>
+                <ul class="space-y-3 text-sm">
+                    {% if school.address %}<li>{{ school.address }}</li>{% endif %}
+                    {% if school.contact_email %}<li><a href="mailto:{{ school.contact_email }}" class="hover:text-indigo-400 transition-colors">{{ school.contact_email }}</a></li>{% endif %}
+                    {% if school.contact_phone %}<li><a href="tel:{{ school.contact_phone }}" class="hover:text-indigo-400 transition-colors">{{ school.contact_phone }}</a></li>{% endif %}
+                </ul>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center text-xs text-slate-600 gap-4">
+            <div>&copy; {% now "Y" %} {{ school.name }}. All rights reserved.</div>
+            <div class="flex gap-4">
+                <a href="#" class="hover:text-slate-400">Privacy Policy</a>
+                <a href="#" class="hover:text-slate-400">Terms of Service</a>
+            </div>
+        </div>
+    </footer>
+
+</div>
+{% endblock %}

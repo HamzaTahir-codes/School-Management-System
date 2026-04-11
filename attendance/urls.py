@@ -4,6 +4,7 @@ from . import views
 app_name = 'attendance'
 
 urlpatterns = [
+    path('', views.index, name='index'),
     path('teachers/', views.TeacherAttendanceListView.as_view(), name='teacher_attendance_list'),
     path('teachers/add/', views.TeacherAttendanceCreateView.as_view(), name='teacher_attendance_add'),
     path('teachers/<int:pk>/edit/', views.TeacherAttendanceUpdateView.as_view(), name='teacher_attendance_edit'),

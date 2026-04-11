@@ -4,6 +4,7 @@ from . import views
 app_name = 'fees'
 
 urlpatterns = [
+    path('', views.index, name='index'),
     path('structures/', views.FeeStructureListView.as_view(), name='fee_structure_list'),
     path('structures/add/', views.FeeStructureCreateView.as_view(), name='fee_structure_add'),
     path('structures/<int:pk>/edit/', views.FeeStructureUpdateView.as_view(), name='fee_structure_edit'),

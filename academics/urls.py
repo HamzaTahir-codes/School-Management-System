@@ -4,6 +4,7 @@ from . import views
 app_name = 'academics'
 
 urlpatterns = [
+    path('', views.index, name='index'),
     # Sessions
     path('sessions/', views.SessionListView.as_view(), name='session_list'),
     path('sessions/add/', views.SessionCreateView.as_view(), name='session_add'),

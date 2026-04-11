@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Fees & Billing{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto w-full py-8">
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight">Financial Billing</h1>
+            <p class="text-slate-500 mt-2">Create fee structures and monitor student payments.</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Structures -->
+        <a href="{% url 'fees:fee_structure_list' %}" class="glass-card p-6 rounded-3xl border border-white hover:border-indigo-200 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/10 group cursor-pointer block" style="text-decoration:none;">
+            <div class="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-6 border border-indigo-100 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-800 mb-2">Fee Structures</h3>
+            <p class="text-slate-500 text-sm">Define tuition, extracurricular, and transport fees for each class.</p>
+        </a>
+
+        <!-- Payments -->
+        <a href="{% url 'fees:payment_list' %}" class="glass-card p-6 rounded-3xl border border-white hover:border-emerald-200 transition-all duration-300 hover:shadow-xl hover:shadow-emerald-500/10 group cursor-pointer block" style="text-decoration:none;">
+            <div class="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-6 border border-emerald-100 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2-2v16l3.5-2 3.5 2 3.5-2 3.5 2z"></path></svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-800 mb-2">Student Payments</h3>
+            <p class="text-slate-500 text-sm">Log received payments, view arrears, and manage financial transactions.</p>
+        </a>
+    </div>
+</div>
+{% endblock %}

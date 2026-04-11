@@ -4,6 +4,7 @@ from . import views
 app_name = 'certificates'
 
 urlpatterns = [
+    path('', views.index, name='index'),
     path('directory/', views.CertificateListView.as_view(), name='certificate_list'),
     path('generate/', views.CertificateCreateView.as_view(), name='certificate_add'),
     path('<int:pk>/edit/', views.CertificateUpdateView.as_view(), name='certificate_edit'),

@@ -3,6 +3,7 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 
 from .models import AcademicSession, ClassLevel, Section, Subject, TeacherAssignment
 from .forms import AcademicSessionForm, ClassLevelForm, SectionForm, SubjectForm, TeacherAssignmentForm
@@ -10,6 +11,16 @@ from .forms import AcademicSessionForm, ClassLevelForm, SectionForm, SubjectForm
 class AdminRequiredMixin(UserPassesTestMixin):
     def test_func(self):
         return self.request.user.is_authenticated and self.request.user.role == 'ADMIN'
+
+from django.shortcuts import render, redirect
+
+def index(request):
+    if not request.user.is_authenticated or request.user.role != 'ADMIN':
+        messages.error(request, 'You are not authorized to visit this page.')
+        if request.user.is_authenticated:
+            return redirect('accounts:dashboard')
+        return redirect('school_index')
+    return render(request, 'academics/index.html')
 
 # ===================== SESSIONS =====================
 class SessionListView(LoginRequiredMixin, AdminRequiredMixin, ListView):

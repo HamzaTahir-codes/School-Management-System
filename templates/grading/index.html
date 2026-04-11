@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Grading & Reports{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto w-full py-8">
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight">Grading System</h1>
+            <p class="text-slate-500 mt-2">Manage student examination marks and generate report cards.</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Marks -->
+        <a href="{% url 'grading:mark_list' %}" class="glass-card p-6 rounded-3xl border border-white hover:border-indigo-200 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/10 group cursor-pointer block" style="text-decoration:none;">
+            <div class="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-6 border border-indigo-100 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-800 mb-2">Term Marks</h3>
+            <p class="text-slate-500 text-sm">Enter and update scores for assignments, midterms, and finals.</p>
+        </a>
+
+        <!-- Reports -->
+        <a href="{% url 'grading:report_list' %}" class="glass-card p-6 rounded-3xl border border-white hover:border-emerald-200 transition-all duration-300 hover:shadow-xl hover:shadow-emerald-500/10 group cursor-pointer block" style="text-decoration:none;">
+            <div class="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-6 border border-emerald-100 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-800 mb-2">Final Reports</h3>
+            <p class="text-slate-500 text-sm">Aggregate marks and generate comprehensive academic report cards.</p>
+        </a>
+    </div>
+</div>
+{% endblock %}

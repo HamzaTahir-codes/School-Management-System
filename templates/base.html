@@ -191,8 +191,14 @@
             <div class="space-y-4 mt-auto pt-6">
                 <a href="{% url 'accounts:password_change' %}" class="nav-link text-sm" style="text-decoration:none;">
                     <svg class="w-5 h-5 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path></svg>
-                    Settings
+                    Profile Settings
                 </a>
+                {% if user.role == 'ADMIN' %}
+                <a href="{% url 'core:school_settings' %}" class="nav-link text-sm" style="text-decoration:none;">
+                    <svg class="w-5 h-5 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                    School Identity
+                </a>
+                {% endif %}
                 <div class="glass-panel p-4 rounded-2xl flex items-center justify-between">
                     <div class="flex items-center gap-3">
                         {% if user.profile_picture %}
@@ -214,7 +220,7 @@
     {% endif %}
 
     <!-- UNIFIED MAIN CONTENT wrapper -->
-    <main class="w-full flex flex-col min-h-screen {% if user.is_authenticated %} main-content-shifted px-4 sm:px-6 lg:px-10 max-w-full {% else %} mx-auto p-4 md:p-8 max-w-6xl items-center {% endif %} page-transition">
+    <main class="w-full flex flex-col min-h-screen {% if user.is_authenticated %} main-content-shifted px-4 sm:px-6 lg:px-10 max-w-full {% else %} {% block guest_main_classes %}mx-auto p-4 md:p-8 max-w-6xl items-center{% endblock %} {% endif %} page-transition">
 
         {% if user.is_authenticated %}
             <!-- Mobile/Tablet Header with Hamburger -->
@@ -233,6 +239,7 @@
             </div>
         {% endif %}
 
+        {% block header %}
         {% if not user.is_authenticated %}
         <!-- Header for Guest -->
         <header class="flex justify-center pt-8 pb-8 w-full animate-slide-up">
@@ -246,25 +253,20 @@
             </a>
         </header>
         {% endif %}
+        {% endblock %}
 
-        {% if messages %}
-        <div class="w-full {% if not user.is_authenticated %} max-w-md {% endif %} mb-8 space-y-3 z-50">
-            {% for message in messages %}
-            <div class="glass-panel p-4 rounded-xl text-slate-800 flex items-center shadow-sm animate-slide-up border-l-4 border-indigo-500">
-                {{ message }}
-            </div>
-            {% endfor %}
-        </div>
-        {% endif %}
+
 
         <div class="flex-grow w-full animate-slide-up flex flex-col {% if not user.is_authenticated %} items-center {% endif %} justify-center">
             {% block content %}
             {% endblock %}
         </div>
 
+        {% block footer %}
         <footer class="mt-16 pt-6 border-t border-slate-300/30 text-center text-slate-500 text-sm pb-8 animate-slide-up w-full">
             &copy; {% now "Y" %} SchoolOS Management System. All rights reserved.
         </footer>
+        {% endblock %}
     </main>
 
     <!-- Global Form Validation Modal Native to System -->
@@ -304,6 +306,113 @@
             </div>
         </div>
     </div>
+    {% endif %}
+
+    {% if messages %}
+    <div id="floating-toasts" class="fixed top-24 right-6 z-[999] flex flex-col gap-3 w-full max-w-sm pointer-events-none">
+        {% for message in messages %}
+        <div class="toast-item pointer-events-auto relative glass-panel p-4 rounded-xl text-slate-800 flex items-start gap-3 shadow-2xl border-l-4 {% if message.tags == 'error' %}border-rose-500{% else %}border-indigo-500{% endif %} overflow-hidden cursor-pointer" 
+             style="animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;">
+            <div class="flex-grow pt-0.5 font-medium text-sm">{{ message }}</div>
+            <button class="toast-close flex-shrink-0 text-slate-400 hover:text-slate-600 transition-colors p-1" aria-label="Close">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+
+    <style>
+        @keyframes slideInRight {
+            from { transform: translateX(120%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes fadeOutUp {
+            from { transform: translateY(0) scale(1); opacity: 1; }
+            to { transform: translateY(-20px) scale(0.9); opacity: 0; }
+        }
+        .toast-leaving {
+            animation: fadeOutUp 0.3s ease forwards !important;
+        }
+        .butterfly-particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: linear-gradient(135deg, #8b5cf6, #ec4899);
+            border-radius: 50% 0 50% 0; /* slight butterfly wing shape */
+            pointer-events: none;
+            z-index: 1000;
+        }
+        @keyframes flutterAway {
+            0% { opacity: 1; transform: translate(0, 0) scale(1) rotate(0deg); }
+            100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0) rotate(var(--rot)); }
+        }
+    </style>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const toasts = document.querySelectorAll('.toast-item');
+            
+            toasts.forEach(toast => {
+                let dismissTimeout;
+                let shattered = false;
+                
+                const removeToast = () => {
+                    if (shattered) return;
+                    toast.classList.add('toast-leaving');
+                    setTimeout(() => toast.remove(), 300);
+                };
+
+                const shatterToast = (e) => {
+                    if (shattered) return;
+                    shattered = true;
+                    clearTimeout(dismissTimeout);
+                    
+                    const rect = toast.getBoundingClientRect();
+                    // Spawn particles
+                    for(let i=0; i<25; i++) {
+                        const p = document.createElement('div');
+                        p.className = 'butterfly-particle';
+                        
+                        // Start point near click
+                        const x = e.clientX - rect.left;
+                        const y = e.clientY - rect.top;
+                        p.style.left = x + 'px';
+                        p.style.top = y + 'px';
+                        
+                        // Trajectories spreading out and floating up
+                        const angle = Math.random() * Math.PI * 2;
+                        const velocity = 40 + Math.random() * 80;
+                        const tx = Math.cos(angle) * velocity;
+                        const ty = Math.sin(angle) * velocity - 40; 
+                        const rot = (Math.random() - 0.5) * 500;
+                        
+                        p.style.setProperty('--tx', `${tx}px`);
+                        p.style.setProperty('--ty', `${ty}px`);
+                        p.style.setProperty('--rot', `${rot}deg`);
+                        
+                        p.style.animation = `flutterAway ${0.5 + Math.random()*0.5}s cubic-bezier(0.25, 1, 0.5, 1) forwards`;
+                        toast.appendChild(p);
+                    }
+                    
+                    // Hide main content
+                    Array.from(toast.children).forEach(c => {
+                        if (!c.classList.contains('butterfly-particle')) c.style.opacity = '0';
+                    });
+                    toast.style.background = 'transparent';
+                    toast.style.boxShadow = 'none';
+                    toast.style.border = 'none';
+                    
+                    setTimeout(() => toast.remove(), 1000);
+                };
+
+                // Click to shatter
+                toast.addEventListener('click', shatterToast);
+
+                // Auto dismiss
+                dismissTimeout = setTimeout(removeToast, 5000);
+            });
+        });
+    </script>
     {% endif %}
 
     <!-- External Custom JS -->

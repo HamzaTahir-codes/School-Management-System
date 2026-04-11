@@ -1,0 +1,28 @@
+# Task: Component 3 (Communication Engine)
+
+- [x] **Model Enhancements (notifications/models.py)**
+    - [x] Add `is_read` to `NotificationLog`.
+    - [x] Add `Broadcast` model with `target_role`.
+
+- [x] **Views & Logic (notifications/views.py)**
+    - [x] Create `UnreadCountView` (HTMX).
+    - [x] Create `NotificationListView` (Inbox).
+    - [x] Create `BroadcastCreateView` (Admin).
+    - [x] Create `BroadcastDetailView`.
+
+- [x] **URL Configuration (notifications/urls.py)**
+
+- [x] **Global UI Integration (templates/base.html)**
+    - [x] Add HTMX CDN.
+    - [x] Insert Notification Bell icon in Sidebar.
+    - [x] Implement HTMX polling (60s).
+
+- [x] **Templates (templates/notifications/)**
+    - [x] Create `partials/unread_badge.html`.
+    - [x] Create `inbox.html`.
+    - [x] Create `broadcast_form.html`.
+
+- [x] **Verification**
+    - [x] Verify Admin can send role-based broadcasts.
+    - [x] Verify HTMX badge updates automatically.
+    - [x] Verify Inbox marks items as read.

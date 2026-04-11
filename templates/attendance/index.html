@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Attendance Management{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto w-full py-8">
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight">Attendance</h1>
+            <p class="text-slate-500 mt-2">Track daily attendance for teachers and students, and manage leave requests.</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Teachers Attendance -->
+        <a href="{% url 'attendance:teacher_attendance_list' %}" class="glass-card p-6 rounded-3xl border border-white hover:border-indigo-200 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/10 group cursor-pointer block" style="text-decoration:none;">
+            <div class="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-6 border border-indigo-100 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-800 mb-2">Teacher Attendance</h3>
+            <p class="text-slate-500 text-sm">Log and monitor daily staff presence and absences.</p>
+        </a>
+
+        <!-- Student Attendance -->
+        <a href="{% url 'attendance:student_attendance_list' %}" class="glass-card p-6 rounded-3xl border border-white hover:border-blue-200 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10 group cursor-pointer block" style="text-decoration:none;">
+            <div class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-6 border border-blue-100 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-800 mb-2">Student Attendance</h3>
+            <p class="text-slate-500 text-sm">Record attendance per period or per day for students.</p>
+        </a>
+
+        <!-- Leaves -->
+        <a href="{% url 'attendance:leave_request_list' %}" class="glass-card p-6 rounded-3xl border border-white hover:border-rose-200 transition-all duration-300 hover:shadow-xl hover:shadow-rose-500/10 group cursor-pointer block" style="text-decoration:none;">
+            <div class="w-14 h-14 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mb-6 border border-rose-100 group-hover:bg-rose-600 group-hover:text-white transition-colors">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-800 mb-2">Leave Requests</h3>
+            <p class="text-slate-500 text-sm">Review, approve, or reject leave applications.</p>
+        </a>
+    </div>
+</div>
+{% endblock %}
