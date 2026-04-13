@@ -61,7 +61,16 @@ def initiate_teacher_attendance(request):
 
     # 1. Time Check
     current_time = timezone.localtime().time()
-    if not (settings.start_time <= current_time <= settings.end_time):
+    is_within_window = False
+    
+    if settings.start_time <= settings.end_time:
+        # Standard window within a single day
+        is_within_window = settings.start_time <= current_time <= settings.end_time
+    else:
+        # Window crosses midnight (e.g., 23:30 to 00:30)
+        is_within_window = current_time >= settings.start_time or current_time <= settings.end_time
+
+    if not is_within_window:
         return JsonResponse({'error': f'Attendance marking is only allowed between {settings.start_time.strftime("%H:%M")} and {settings.end_time.strftime("%H:%M")}.'}, status=400)
 
     # 2. Network Check

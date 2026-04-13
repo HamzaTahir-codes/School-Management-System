@@ -27,7 +27,7 @@ from django.db.models import Sum, Count
 from people.models import TeacherProfile, StudentProfile, ParentProfile
 from fees.models import StudentFeePayment
 from academics.models import ClassLevel
-from attendance.models import StudentAttendance, LeaveRequest
+from attendance.models import StudentAttendance, LeaveRequest, TeacherAttendance
 from django.utils import timezone
 
 @login_required
@@ -73,6 +73,14 @@ def dashboard_view(request):
             context['teacher_profile'] = profile
             context['assignments'] = profile.get_active_assignments()
             context['total_students_managed'] = profile.get_total_students_count()
+            
+            # Check if attendance marked today
+            today = timezone.localtime().date()
+            context['attendance_marked_today'] = TeacherAttendance.objects.filter(
+                teacher=profile, 
+                date=today,
+                is_present=True
+            ).exists()
         except TeacherProfile.DoesNotExist:
             messages.warning(request, "Teacher profile not found. Please contact admin.")
 
