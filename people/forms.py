@@ -39,10 +39,10 @@ class ParentCreationForm(BaseUserCreationForm):
         model = ParentProfile
         fields = ['address']
 
-class StudentCreationForm(BaseUserCreationForm):
+class StudentCreationForm(forms.ModelForm):
     class Meta:
         model = StudentProfile
-        fields = ['parent', 'class_level', 'section', 'roll_number', 'date_of_birth']
+        fields = ['first_name', 'last_name', 'profile_picture', 'parent', 'class_level', 'section', 'roll_number', 'date_of_birth']
         widgets = {
             'date_of_birth': forms.DateInput(attrs={'type': 'date'}),
         }
@@ -69,7 +69,7 @@ class TeacherUpdateForm(forms.ModelForm):
 class StudentUpdateForm(forms.ModelForm):
     class Meta:
         model = StudentProfile
-        fields = ['parent', 'class_level', 'section', 'roll_number', 'date_of_birth', 'status']
+        fields = ['first_name', 'last_name', 'profile_picture', 'parent', 'class_level', 'section', 'roll_number', 'date_of_birth', 'status']
         widgets = {
             'date_of_birth': forms.DateInput(attrs={'type': 'date'}),
         }
@@ -78,3 +78,4 @@ class ParentUpdateForm(forms.ModelForm):
     class Meta:
         model = ParentProfile
         fields = ['address']
+

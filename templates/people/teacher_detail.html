@@ -26,11 +26,20 @@
             <p class="text-slate-500 mt-1">{{ teacher.user.email|default:"No email" }} &middot; {{ teacher.user.phone_number|default:"No phone" }}</p>
             <p class="text-slate-400 text-sm mt-1">Joined: {{ teacher.joining_date|date:"F j, Y"|default:"N/A" }} &middot; DOB: {{ teacher.date_of_birth|date:"F j, Y"|default:"N/A" }}</p>
         </div>
-        <div class="flex gap-3 flex-shrink-0">
+        <div class="flex gap-3 flex-shrink-0 flex-wrap justify-end">
             <a href="{% url 'people:teacher_edit' teacher.pk %}" class="glass-btn px-5 py-2.5 rounded-xl font-medium text-sm inline-flex items-center">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                 Edit
             </a>
+            {% if teacher.registered_device_id %}
+            <form action="{% url 'attendance:teacher_reset_device' teacher.pk %}" method="POST" class="inline">
+                {% csrf_token %}
+                <button type="submit" class="px-5 py-2.5 rounded-xl font-medium text-sm inline-flex items-center bg-yellow-100/70 text-yellow-700 hover:bg-yellow-200 transition" onclick="return confirm('Are you sure you want to reset the bound device? They will need to bind a new one next time they log attendance.')">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"></path></svg>
+                    Reset Device
+                </button>
+            </form>
+            {% endif %}
             <a href="{% url 'people:teacher_delete' teacher.pk %}" class="px-5 py-2.5 rounded-xl font-medium text-sm inline-flex items-center bg-rose-100/70 text-rose-600 hover:bg-rose-200 transition">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                 Delete
@@ -97,7 +106,7 @@
             <tbody class="divide-y divide-indigo-50">
                 {% for m in recent_marks %}
                 <tr class="hover:bg-white/40 transition-colors">
-                    <td class="p-4 font-bold text-slate-800">{{ m.student.user.get_full_name }}</td>
+                    <td class="p-4 font-bold text-slate-800">{{ m.student.get_full_name }}</td>
                     <td class="p-4 text-slate-600">{{ m.subject.name }}</td>
                     <td class="p-4 font-bold text-indigo-600">{{ m.marks_obtained }}/{{ m.max_marks }}</td>
                 </tr>

@@ -96,7 +96,7 @@ class TeacherDetailView(LoginRequiredMixin, AdminRequiredMixin, DetailView):
         context['attendance_absent'] = TeacherAttendance.objects.filter(teacher=teacher, is_present=False).count()
         from grading.models import Mark
         context['recent_marks'] = Mark.objects.filter(teacher=teacher).select_related(
-            'student__user', 'subject'
+            'student', 'subject'
         ).order_by('-id')[:10]
         return context
 
@@ -265,12 +265,16 @@ class StudentListView(LoginRequiredMixin, AdminRequiredMixin, ListView):
     context_object_name = 'students'
 
 
-class StudentCreateView(BaseProfileCreateView):
+class StudentCreateView(LoginRequiredMixin, AdminRequiredMixin, CreateView):
     model = StudentProfile
     form_class = StudentCreationForm
     template_name = 'people/student_form.html'
     success_url = reverse_lazy('people:student_list')
-    role = User.Role.STUDENT
+
+    def form_valid(self, form):
+        form.save()
+        messages.success(self.request, "Student registered successfully.")
+        return redirect(self.success_url)
 
 
 class StudentDetailView(LoginRequiredMixin, AdminRequiredMixin, DetailView):
@@ -294,41 +298,18 @@ class StudentDetailView(LoginRequiredMixin, AdminRequiredMixin, DetailView):
 class StudentUpdateView(LoginRequiredMixin, AdminRequiredMixin, UpdateView):
     model = StudentProfile
     form_class = StudentUpdateForm
-    template_name = 'people/profile_edit.html'
+    template_name = 'people/student_edit.html'
 
     def get_success_url(self):
         return reverse_lazy('people:student_detail', kwargs={'pk': self.object.pk})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = f'Edit Student: {self.object.user.get_full_name()}'
-        context['user_form'] = BaseUserUpdateForm(initial={
-            'first_name': self.object.user.first_name,
-            'last_name': self.object.user.last_name,
-            'email': self.object.user.email,
-            'phone_number': self.object.user.phone_number,
-        })
+        context['title'] = f'Edit Student: {self.object.get_full_name()}'
         context['back_url'] = reverse_lazy('people:student_detail', kwargs={'pk': self.object.pk})
         return context
 
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        form = self.get_form()
-        user_form = BaseUserUpdateForm(request.POST, request.FILES)
-        if form.is_valid() and user_form.is_valid():
-            return self.forms_valid(form, user_form)
-        return self.render_to_response(self.get_context_data(form=form))
-
-    def forms_valid(self, form, user_form):
-        user = self.object.user
-        user.first_name = user_form.cleaned_data['first_name']
-        user.last_name = user_form.cleaned_data['last_name']
-        user.email = user_form.cleaned_data['email']
-        user.phone_number = user_form.cleaned_data['phone_number']
-        pic = user_form.cleaned_data.get('profile_picture')
-        if pic:
-            user.profile_picture = pic
-        user.save()
+    def form_valid(self, form):
         form.save()
         messages.success(self.request, "Student profile updated successfully.")
         return redirect(self.get_success_url())
@@ -342,13 +323,11 @@ class StudentDeleteView(LoginRequiredMixin, AdminRequiredMixin, DeleteView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Delete Student'
-        context['name'] = self.object.user.get_full_name() or self.object.user.username
+        context['name'] = self.object.get_full_name()
         context['back_url'] = reverse_lazy('people:student_detail', kwargs={'pk': self.object.pk})
         return context
 
     def form_valid(self, form):
-        user = self.object.user
         response = super().form_valid(form)
-        user.delete()
-        messages.success(self.request, "Student and associated account permanently deleted.")
+        messages.success(self.request, "Student record permanently deleted.")
         return response

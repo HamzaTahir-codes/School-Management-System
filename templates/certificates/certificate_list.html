@@ -28,7 +28,7 @@
             <tbody class="divide-y divide-indigo-50">
                 {% for doc in certificates %}
                 <tr class="hover:bg-white/40 transition-colors block md:table-row pb-4 pt-4 md:py-0 border-b md:border-b-0 border-indigo-50">
-                    <td class="p-4 font-bold text-slate-800">{{ doc.student.user.get_full_name }}</td>
+                    <td class="p-4 font-bold text-slate-800">{{ doc.student.get_full_name }}</td>
                     <td class="p-4 text-slate-600 font-medium">
                         {% if doc.certificate_type == 'LEAVING' %}
                         <span class="px-3 py-1 bg-rose-100 text-rose-700 rounded-full text-xs box-border">Leaving Certificate</span>

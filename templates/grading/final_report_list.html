@@ -28,7 +28,7 @@
             <tbody class="divide-y divide-indigo-50">
                 {% for report in reports %}
                 <tr class="hover:bg-white/40 transition-colors">
-                    <td class="p-4 font-bold text-slate-800">{{ report.student.user.get_full_name }}</td>
+                    <td class="p-4 font-bold text-slate-800">{{ report.student.get_full_name }}</td>
                     <td class="p-4 text-slate-600 font-medium">{{ report.academic_session.name }}</td>
                     <td class="p-4 font-bold text-slate-700 group relative">
                         {{ report.overall_percentage }}% ({{ report.grade }})

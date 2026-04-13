@@ -29,7 +29,7 @@
             <tbody class="divide-y divide-indigo-50">
                 {% for record in payments %}
                 <tr class="hover:bg-white/40 transition-colors">
-                    <td class="p-4 font-bold text-slate-800">{{ record.student.user.get_full_name }}</td>
+                    <td class="p-4 font-bold text-slate-800">{{ record.student.get_full_name }}</td>
                     <td class="p-4 text-slate-600 font-medium">{{ record.payment_date|date:"F j, Y" }}</td>
                     <td class="p-4 font-bold text-green-600">${{ record.amount_paid }}</td>
                     <td class="p-4 text-slate-600">{{ record.month }}</td>
