@@ -6,6 +6,7 @@ class TeacherProfile(models.Model):
     date_of_birth = models.DateField()
     joining_date = models.DateField()
     bio = models.TextField(blank=True)
+    registered_device_id = models.CharField(max_length=255, null=True, blank=True)
 
     def get_active_assignments(self):
         from academics.models import TeacherAssignment, AcademicSession
@@ -37,7 +38,11 @@ class StudentProfile(models.Model):
         LEFT = 'LEFT', _('Left School')
         GRADUATED = 'GRADUATED', _('Graduated')
 
-    user = models.OneToOneField('accounts.User', on_delete=models.CASCADE, related_name='student_profile')
+    # Student info stored directly (no User account needed)
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50, blank=True)
+    profile_picture = models.ImageField(upload_to='profile_pics/students/', blank=True, null=True)
+
     parent = models.ForeignKey('people.ParentProfile', on_delete=models.CASCADE, related_name='children')
     class_level = models.ForeignKey('academics.ClassLevel', on_delete=models.PROTECT)
     section = models.ForeignKey('academics.Section', on_delete=models.PROTECT)
@@ -48,6 +53,12 @@ class StudentProfile(models.Model):
 
     class Meta:
         unique_together = ('roll_number', 'class_level')
+
+    @property
+    def get_full_name(self):
+        """Return the student's full name."""
+        full = f"{self.first_name} {self.last_name}".strip()
+        return (full or self.roll_number).title()
 
     def get_attendance_stats(self):
         from attendance.models import StudentAttendance
@@ -86,7 +97,7 @@ class StudentProfile(models.Model):
         }
 
     def __str__(self):
-        return f"{self.user.get_full_name() or self.user.username} - {self.class_level}"
+        return f"{self.get_full_name()} - {self.class_level}"
 
 # Add to TeacherProfile
-# (I will add them below the TeacherProfile class definition)
+# (I will add them below the TeacherProfile class definition)

@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ student.user.get_full_name }} - SchoolOS{% endblock %}
+{% block title %}{{ student.get_full_name }} - SchoolOS{% endblock %}
 
 {% block content %}
 <div class="mb-6">
@@ -14,15 +14,15 @@
 <div class="glass-panel rounded-3xl p-8 mb-8 relative overflow-hidden">
     <div class="absolute -right-16 -top-16 w-48 h-48 bg-purple-200 rounded-full blur-3xl opacity-30 pointer-events-none"></div>
     <div class="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-        {% if student.user.profile_picture %}
-            <img src="{{ student.user.profile_picture.url }}" alt="{{ student.user.get_full_name }}" class="w-24 h-24 rounded-2xl object-cover shadow-lg border-2 border-white/60">
+        {% if student.profile_picture %}
+            <img src="{{ student.profile_picture.url }}" alt="{{ student.get_full_name }}" class="w-24 h-24 rounded-2xl object-cover shadow-lg border-2 border-white/60">
         {% else %}
             <div class="w-24 h-24 rounded-2xl bg-gradient-to-tr from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-3xl shadow-lg">
-                {{ student.user.first_name|first|default:student.user.username|first|upper }}
+                {{ student.first_name|first|upper }}
             </div>
         {% endif %}
         <div class="flex-grow">
-            <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight">{{ student.user.get_full_name|default:student.user.username }}</h1>
+            <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight">{{ student.get_full_name }}</h1>
             <p class="text-slate-500 mt-1">{{ student.class_level }} — Section {{ student.section }} &middot; Roll #{{ student.roll_number }}</p>
             <p class="text-slate-400 text-sm mt-1">DOB: {{ student.date_of_birth|date:"F j, Y" }} &middot; Admitted: {{ student.admission_date|date:"F j, Y" }}</p>
         </div>
