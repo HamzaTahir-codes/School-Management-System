@@ -4,8 +4,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
-from .models import TeacherAttendance, StudentAttendance, LeaveRequest
-from .forms import TeacherAttendanceForm, StudentAttendanceForm, LeaveRequestForm
+from .models import TeacherAttendance, StudentAttendance, LeaveRequest, AttendanceSettings, TeacherAttendanceOTP
+from .forms import TeacherAttendanceForm, StudentAttendanceForm, LeaveRequestForm, AttendanceSettingsForm
+from django.http import JsonResponse
+from django.utils import timezone
+import ipaddress
+import random
+from datetime import timedelta
 
 class AdminRequiredMixin(UserPassesTestMixin):
     def test_func(self):
@@ -40,35 +45,123 @@ class TeacherAttendanceListView(LoginRequiredMixin, AdminRequiredMixin, ListView
         ctx['title'] = 'Teacher Attendance'
         return ctx
 
-class TeacherAttendanceCreateView(LoginRequiredMixin, AdminRequiredMixin, CreateView):
-    model = TeacherAttendance
-    form_class = TeacherAttendanceForm
-    template_name = 'attendance/generic_form.html'
-    success_url = reverse_lazy('attendance:teacher_attendance_list')
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        ctx['title'] = 'Log Teacher Attendance'
-        ctx['back_url'] = reverse_lazy('attendance:teacher_attendance_list')
-        return ctx
-    def form_valid(self, form):
-        form.instance.marked_by = self.request.user
-        messages.success(self.request, "Teacher attendance recorded.")
-        return super().form_valid(form)
+@login_required
+def initiate_teacher_attendance(request):
+    if request.method != 'POST' or getattr(request.user, 'role', '') != 'TEACHER':
+        return JsonResponse({'error': 'Unauthorized'}, status=403)
+    
+    try:
+        profile = request.user.teacher_profile
+    except Exception:
+        return JsonResponse({'error': 'Teacher profile not found'}, status=404)
 
-class TeacherAttendanceUpdateView(LoginRequiredMixin, AdminRequiredMixin, UpdateView):
-    model = TeacherAttendance
-    form_class = TeacherAttendanceForm
-    template_name = 'attendance/generic_form.html'
-    success_url = reverse_lazy('attendance:teacher_attendance_list')
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        ctx['title'] = 'Edit Teacher Attendance'
-        ctx['back_url'] = reverse_lazy('attendance:teacher_attendance_list')
-        return ctx
+    settings = AttendanceSettings.objects.first()
+    if not settings:
+        return JsonResponse({'error': 'Attendance is not configured yet.'}, status=400)
 
-class TeacherAttendanceDeleteView(LoginRequiredMixin, AdminRequiredMixin, GenericDeleteMixin, DeleteView):
-    model = TeacherAttendance
-    success_url = reverse_lazy('attendance:teacher_attendance_list')
+    # 1. Time Check
+    current_time = timezone.localtime().time()
+    if not (settings.start_time <= current_time <= settings.end_time):
+        return JsonResponse({'error': f'Attendance marking is only allowed between {settings.start_time.strftime("%H:%M")} and {settings.end_time.strftime("%H:%M")}.'}, status=400)
+
+    # 2. Network Check
+    # Handle X-Forwarded-For if behind a proxy like ngrok
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        request_ip = x_forwarded_for.split(',')[0].strip()
+    else:
+        request_ip = request.META.get('REMOTE_ADDR')
+
+    try:
+        client_ip = ipaddress.ip_address(request_ip)
+        allowed_network = ipaddress.ip_network(settings.allowed_ip_network, strict=False)
+        if client_ip not in allowed_network:
+            return JsonResponse({'error': 'You must be connected to the school network to mark attendance.'}, status=403)
+    except ValueError:
+        return JsonResponse({'error': 'Unable to determine or validate your IP address.'}, status=400)
+    
+    # 3. Rate limiting Check (max 3 per minute)
+    one_min_ago = timezone.now() - timedelta(minutes=1)
+    recent_otps = TeacherAttendanceOTP.objects.filter(teacher=profile, created_at__gte=one_min_ago).count()
+    if recent_otps >= 3:
+        return JsonResponse({'error': 'Too many requests. Please wait a minute.'}, status=429)
+
+    # All checks passed, generate OTP
+    otp_code = str(random.randint(100000, 999999))
+    expires = timezone.now() + timedelta(seconds=60)
+    
+    TeacherAttendanceOTP.objects.create(
+        teacher=profile,
+        otp=otp_code,
+        expires_at=expires,
+        request_ip=request_ip
+    )
+
+    return JsonResponse({
+        'success': True,
+        'message': 'OTP generated successfully.',
+        'otp': otp_code
+    })
+
+@login_required
+def verify_teacher_attendance(request):
+    if request.method != 'POST' or getattr(request.user, 'role', '') != 'TEACHER':
+        return JsonResponse({'error': 'Unauthorized'}, status=403)
+
+    try:
+        profile = request.user.teacher_profile
+    except Exception:
+        return JsonResponse({'error': 'Teacher profile not found'}, status=404)
+
+    otp_input = request.POST.get('otp', '').strip()
+    device_id_input = request.POST.get('device_id', '').strip()
+
+    if not otp_input or not device_id_input:
+        return JsonResponse({'error': 'Missing OTP or Device ID'}, status=400)
+
+    # Validate Device Binding
+    if profile.registered_device_id:
+        if profile.registered_device_id != device_id_input:
+            return JsonResponse({'error': 'Unrecognized device. Please use your registered device or contact admin to reset.'}, status=403)
+    else:
+        # First time marking attendance, bind device
+        profile.registered_device_id = device_id_input
+        profile.save(update_fields=['registered_device_id'])
+
+    # Validate OTP
+    otp_record = TeacherAttendanceOTP.objects.filter(
+        teacher=profile,
+        otp=otp_input,
+        is_used=False
+    ).order_by('-created_at').first()
+
+    if not otp_record:
+        return JsonResponse({'error': 'Invalid OTP.'}, status=400)
+
+    if timezone.now() > otp_record.expires_at:
+        return JsonResponse({'error': 'OTP has expired. Please initiate again.'}, status=400)
+
+    # Mark as used
+    otp_record.is_used = True
+    otp_record.save(update_fields=['is_used'])
+
+    # Record Attendance
+    today = timezone.localtime().date()
+    att, created = TeacherAttendance.objects.get_or_create(
+        teacher=profile,
+        date=today,
+        defaults={
+            'is_present': True,
+            'verified_by_otp': True,
+            'ip_address': otp_record.request_ip,
+            'device_id': device_id_input
+        }
+    )
+
+    if not created:
+        return JsonResponse({'error': 'Attendance already marked for today.'}, status=400)
+
+    return JsonResponse({'success': True, 'message': 'Attendance marked successfully.'})
 
 # --- Student Attendance ---
 class StudentAttendanceListView(LoginRequiredMixin, AdminRequiredMixin, ListView):
@@ -147,3 +240,47 @@ class LeaveRequestUpdateView(LoginRequiredMixin, AdminRequiredMixin, UpdateView)
 class LeaveRequestDeleteView(LoginRequiredMixin, AdminRequiredMixin, GenericDeleteMixin, DeleteView):
     model = LeaveRequest
     success_url = reverse_lazy('attendance:leave_request_list')
+
+# --- Administration ---
+class AttendanceSettingsUpdateView(LoginRequiredMixin, AdminRequiredMixin, UpdateView):
+    model = AttendanceSettings
+    form_class = AttendanceSettingsForm
+    template_name = 'attendance/generic_form.html'
+    success_url = reverse_lazy('attendance:settings')
+
+    def get_object(self, queryset=None):
+        obj, created = AttendanceSettings.objects.get_or_create(id=1)
+        return obj
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['title'] = 'Attendance Settings'
+        ctx['back_url'] = reverse_lazy('attendance:teacher_attendance_list')
+        
+        # Get client IP for easier setup
+        x_forwarded_for = self.request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            client_ip = x_forwarded_for.split(',')[0].strip()
+        else:
+            client_ip = self.request.META.get('REMOTE_ADDR')
+        
+        ctx['client_ip'] = client_ip
+        ctx['help_text'] = f"Your current detected IP is: {client_ip}. You can use this to configure the allowed network (e.g., {client_ip}/32)."
+        return ctx
+
+    def form_valid(self, form):
+        messages.success(self.request, "Attendance settings updated successfully.")
+        return super().form_valid(form)
+
+from django.views.generic import View
+from django.shortcuts import get_object_or_404
+from people.models import TeacherProfile
+
+class ResetTeacherDeviceView(LoginRequiredMixin, AdminRequiredMixin, View):
+    def post(self, request, pk, *args, **kwargs):
+        teacher = get_object_or_404(TeacherProfile, pk=pk)
+        teacher.registered_device_id = None
+        teacher.save(update_fields=['registered_device_id'])
+        messages.success(request, f"Device ID reset for {teacher.user.get_full_name()}. They can now bind a new device on their next attendance login.")
+        return redirect('people:teacher_detail', pk=teacher.pk)
+

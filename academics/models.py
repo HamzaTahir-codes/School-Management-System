@@ -8,7 +8,7 @@ class AcademicSession(models.Model):
     def save(self, *args, **kwargs):
         if self.is_current:
             AcademicSession.objects.filter(
-                school=self.school, is_current=True
+                is_current=True
             ).update(is_current=False)
         super().save(*args, **kwargs)
 

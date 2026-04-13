@@ -33,7 +33,7 @@
                         {% if request.teacher %}
                             {{ request.teacher.user.get_full_name }}
                         {% elif request.student %}
-                            {{ request.student.user.get_full_name }}
+                            {{ request.student.get_full_name }}
                         {% else %}
                             System
                         {% endif %}
