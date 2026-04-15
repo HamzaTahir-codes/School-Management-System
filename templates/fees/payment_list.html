@@ -14,40 +14,44 @@
     </a>
 </div>
 
-<div class="glass-card p-2 rounded-3xl overflow-hidden border border-white/60">
-    <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-            <thead>
-                <tr class="border-b border-indigo-100 bg-indigo-50/50">
-                    <th class="p-4 font-semibold text-slate-700">Student Name</th>
-                    <th class="p-4 font-semibold text-slate-700">Transaction Date</th>
-                    <th class="p-4 font-semibold text-slate-700">Amount Paid</th>
-                    <th class="p-4 font-semibold text-slate-700">Month</th>
-                    <th class="p-4 font-semibold text-slate-700">Clearance Status</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-indigo-50">
-                {% for record in payments %}
-                <tr class="hover:bg-white/40 transition-colors">
-                    <td class="p-4 font-bold text-slate-800">{{ record.student.get_full_name }}</td>
-                    <td class="p-4 text-slate-600 font-medium">{{ record.payment_date|date:"F j, Y" }}</td>
-                    <td class="p-4 font-bold text-green-600">${{ record.amount_paid }}</td>
-                    <td class="p-4 text-slate-600">{{ record.month }}</td>
-                    <td class="p-4">
-                        {% if record.is_confirmed %}
-                        <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold border border-green-200">Deposited</span>
-                        {% else %}
-                        <span class="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-bold border border-amber-200">Pending</span>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="5" class="p-8 text-center text-slate-500">No payment records exist.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+<div id="list-container" class="animate-fade-in">
+    <div class="glass-card p-2 rounded-3xl overflow-hidden border border-white/60">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="border-b border-indigo-100 bg-indigo-50/50">
+                        <th class="p-4 font-semibold text-slate-700">Student Name</th>
+                        <th class="p-4 font-semibold text-slate-700">Transaction Date</th>
+                        <th class="p-4 font-semibold text-slate-700">Amount Paid</th>
+                        <th class="p-4 font-semibold text-slate-700">Month</th>
+                        <th class="p-4 font-semibold text-slate-700">Clearance Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-indigo-50">
+                    {% for record in payments %}
+                    <tr class="hover:bg-white/40 transition-colors">
+                        <td class="p-4 font-bold text-slate-800">{{ record.student.get_full_name }}</td>
+                        <td class="p-4 text-slate-600 font-medium">{{ record.payment_date|date:"F j, Y" }}</td>
+                        <td class="p-4 font-bold text-green-600">${{ record.amount_paid }}</td>
+                        <td class="p-4 text-slate-600">{{ record.month }}</td>
+                        <td class="p-4">
+                            {% if record.is_confirmed %}
+                            <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold border border-green-200">Deposited</span>
+                            {% else %}
+                            <span class="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-bold border border-amber-200">Pending</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="p-8 text-center text-slate-500">No payment records exist.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
+
+    {% include 'includes/pagination.html' %}
 </div>
 {% endblock %}

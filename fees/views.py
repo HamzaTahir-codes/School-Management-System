@@ -35,6 +35,7 @@ class FeeStructureListView(LoginRequiredMixin, AdminRequiredMixin, ListView):
     model = FeeStructure
     template_name = 'fees/fee_structure_list.html'
     context_object_name = 'structures'
+    paginate_by = 10
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx['title'] = 'Fee Structures'
@@ -74,6 +75,7 @@ class StudentFeePaymentListView(LoginRequiredMixin, AdminRequiredMixin, ListView
     model = StudentFeePayment
     template_name = 'fees/payment_list.html'
     context_object_name = 'payments'
+    paginate_by = 10
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx['title'] = 'Student Payments'

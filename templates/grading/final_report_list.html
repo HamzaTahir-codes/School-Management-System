@@ -14,46 +14,50 @@
     </a>
 </div>
 
-<div class="glass-card p-2 rounded-3xl overflow-hidden border border-white/60">
-    <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-            <thead>
-                <tr class="border-b border-indigo-100 bg-indigo-50/50">
-                    <th class="p-4 font-semibold text-slate-700">Student Name</th>
-                    <th class="p-4 font-semibold text-slate-700">Academic Session</th>
-                    <th class="p-4 font-semibold text-slate-700">Overall Yield</th>
-                    <th class="p-4 font-semibold text-slate-700">Status</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-indigo-50">
-                {% for report in reports %}
-                <tr class="hover:bg-white/40 transition-colors">
-                    <td class="p-4 font-bold text-slate-800">{{ report.student.get_full_name }}</td>
-                    <td class="p-4 text-slate-600 font-medium">{{ report.academic_session.name }}</td>
-                    <td class="p-4 font-bold text-slate-700 group relative">
-                        {{ report.overall_percentage }}% ({{ report.grade }})
-                        
-                        <!-- Tooltip for AI Summary / Remarks -->
-                        <div class="absolute left-0 bottom-full mb-2 w-64 bg-slate-800 text-white text-xs rounded-xl p-3 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                            <strong>Teacher:</strong> {{ report.teacher_remarks|default:"No remarks." }} <br><br>
-                            <strong>AI:</strong> {{ report.ai_summary|default:"Pending analysis..." }}
-                        </div>
-                    </td>
-                    <td class="p-4">
-                        {% if report.is_published %}
-                        <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold border border-green-200">Published</span>
-                        {% else %}
-                        <span class="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-bold border border-amber-200">Draft</span>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="4" class="p-8 text-center text-slate-500">No final reports have been compiled.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+<div id="list-container" class="animate-fade-in">
+    <div class="glass-card p-2 rounded-3xl overflow-hidden border border-white/60">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="border-b border-indigo-100 bg-indigo-50/50">
+                        <th class="p-4 font-semibold text-slate-700">Student Name</th>
+                        <th class="p-4 font-semibold text-slate-700">Academic Session</th>
+                        <th class="p-4 font-semibold text-slate-700">Overall Yield</th>
+                        <th class="p-4 font-semibold text-slate-700">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-indigo-50">
+                    {% for report in reports %}
+                    <tr class="hover:bg-white/40 transition-colors">
+                        <td class="p-4 font-bold text-slate-800">{{ report.student.get_full_name }}</td>
+                        <td class="p-4 text-slate-600 font-medium">{{ report.academic_session.name }}</td>
+                        <td class="p-4 font-bold text-slate-700 group relative">
+                            {{ report.overall_percentage }}% ({{ report.grade }})
+                            
+                            <!-- Tooltip for AI Summary / Remarks -->
+                            <div class="absolute left-0 bottom-full mb-2 w-64 bg-slate-800 text-white text-xs rounded-xl p-3 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                                <strong>Teacher:</strong> {{ report.teacher_remarks|default:"No remarks." }} <br><br>
+                                <strong>AI:</strong> {{ report.ai_summary|default:"Pending analysis..." }}
+                            </div>
+                        </td>
+                        <td class="p-4">
+                            {% if report.is_published %}
+                            <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold border border-green-200">Published</span>
+                            {% else %}
+                            <span class="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-bold border border-amber-200">Draft</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="p-8 text-center text-slate-500">No final reports have been compiled.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
+
+    {% include 'includes/pagination.html' %}
 </div>
 {% endblock %}

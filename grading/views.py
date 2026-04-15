@@ -35,6 +35,7 @@ class MarkListView(LoginRequiredMixin, AdminRequiredMixin, ListView):
     model = Mark
     template_name = 'grading/mark_list.html'
     context_object_name = 'marks'
+    paginate_by = 10
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx['title'] = 'Student Term Marks'
@@ -74,6 +75,7 @@ class FinalReportListView(LoginRequiredMixin, AdminRequiredMixin, ListView):
     model = FinalReport
     template_name = 'grading/final_report_list.html'
     context_object_name = 'reports'
+    paginate_by = 10
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx['title'] = 'Final Aggregated Reports'

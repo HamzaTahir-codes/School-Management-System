@@ -34,6 +34,7 @@ class CertificateListView(LoginRequiredMixin, AdminRequiredMixin, ListView):
     model = Certificate
     template_name = 'certificates/certificate_list.html'
     context_object_name = 'certificates'
+    paginate_by = 10
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx['title'] = 'Document & Certificate Management'
