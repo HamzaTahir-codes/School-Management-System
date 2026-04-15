@@ -5,9 +5,8 @@
 {% block content %}
 <div class="mb-8 flex justify-between items-end flex-wrap gap-4">
     <div>
-        <h1 class="text-4xl font-extrabold text-slate-800 tracking-tight">System Users [V5]</h1>
+        <h1 class="text-4xl font-extrabold text-slate-800 tracking-tight">System Users</h1>
         <p class="text-slate-500 mt-2">Manage all administrative, teacher, and parent accounts.</p>
-        <div class="bg-red-500 text-white p-2 text-xs font-bold rounded mt-2">DEBUG: TEMPLATE RENDERING CHECK [V5]</div>
     </div>
 </div>
 
@@ -41,92 +40,84 @@
 </div>
 
 <!-- Users Table -->
-<div class="glass-card p-2 rounded-3xl overflow-hidden border border-white/60">
-    <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-            <thead>
-                <tr class="border-b border-indigo-100 bg-indigo-50/50">
-                    <th class="p-4 font-semibold text-slate-700">User Details</th>
-                    <th class="p-4 font-semibold text-slate-700">Role</th>
-                    <th class="p-4 font-semibold text-slate-700">Phone</th>
-                    <th class="p-4 font-semibold text-slate-700">Status</th>
-                    <th class="p-4 font-semibold text-slate-700 text-right">Actions</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-indigo-50">
-                {% for user_obj in users_list %}
-                <tr class="hover:bg-white/40 transition-colors group">
-                    <td class="p-4">
-                        <div class="flex items-center gap-4">
-                            {% if user_obj.profile_picture %}
-                                <img src="{{ user_obj.profile_picture.url }}" class="w-12 h-12 rounded-xl object-cover shadow-sm">
+<div id="list-container" class="animate-fade-in">
+    <div class="glass-card p-2 rounded-3xl overflow-hidden border border-white/60">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="border-b border-indigo-100 bg-indigo-50/50">
+                        <th class="p-4 font-semibold text-slate-700">User Details</th>
+                        <th class="p-4 font-semibold text-slate-700">Role</th>
+                        <th class="p-4 font-semibold text-slate-700">Phone</th>
+                        <th class="p-4 font-semibold text-slate-700">Status</th>
+                        <th class="p-4 font-semibold text-slate-700 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-indigo-50">
+                    {% for user_obj in users_list %}
+                    <tr class="hover:bg-white/40 transition-colors group">
+                        <td class="p-4">
+                            <div class="flex items-center gap-4">
+                                {% if user_obj.profile_picture %}
+                                    <img src="{{ user_obj.profile_picture.url }}" class="w-12 h-12 rounded-xl object-cover shadow-sm">
+                                {% else %}
+                                    <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-indigo-100 to-indigo-200 text-indigo-700 flex items-center justify-center font-bold shadow-sm">
+                                        {{ user_obj.username|first|upper }}
+                                    </div>
+                                {% endif %}
+                                <div>
+                                    <div class="font-bold text-slate-800">
+                                        {% if user_obj.first_name %}{{ user_obj.first_name }} {{ user_obj.last_name }}{% else %}{{ user_obj.username }}{% endif %}
+                                    </div>
+                                    <div class="text-xs text-slate-400 font-medium">{{ user_obj.email|default:"No email" }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="p-4">
+                            <span class="px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full text-xs font-bold border border-indigo-100 uppercase">
+                                {{ user_obj.get_role_display }}
+                            </span>
+                        </td>
+                        <td class="p-4 text-slate-600 font-medium text-sm">
+                            {{ user_obj.phone_number|default:"—" }}
+                        </td>
+                        <td class="p-4">
+                            {% if user_obj.is_active %}
+                                <div class="flex items-center text-emerald-600 text-xs font-bold">
+                                    <span class="w-2 h-2 bg-emerald-500 rounded-full mr-2"></span> Active
+                                </div>
                             {% else %}
-                                <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-indigo-100 to-indigo-200 text-indigo-700 flex items-center justify-center font-bold shadow-sm">
-                                    {{ user_obj.username|first|upper }}
+                                <div class="flex items-center text-slate-400 text-xs font-bold">
+                                    <span class="w-2 h-2 bg-slate-300 rounded-full mr-2"></span> Inactive
                                 </div>
                             {% endif %}
-                            <div>
-                                <div class="font-bold text-slate-800">
-                                    {% if user_obj.first_name %}{{ user_obj.first_name }} {{ user_obj.last_name }}{% else %}{{ user_obj.username }}{% endif %}
-                                </div>
-                                <div class="text-xs text-slate-400 font-medium">{{ user_obj.email|default:"No email" }}</div>
+                        </td>
+                        <td class="p-4 text-right">
+                            <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <a href="{% url 'accounts:user_edit' user_obj.pk %}" class="p-2 hover:bg-white/60 text-slate-500 hover:text-indigo-600 rounded-xl transition" title="Edit User">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                </a>
+                                {% if user_obj != request.user %}
+                                <a href="{% url 'accounts:user_delete' user_obj.pk %}" class="p-2 hover:bg-rose-50 text-slate-400 hover:text-rose-600 rounded-xl transition" title="Delete User">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                </a>
+                                {% endif %}
                             </div>
-                        </div>
-                    </td>
-                    <td class="p-4">
-                        <span class="px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full text-xs font-bold border border-indigo-100 uppercase">
-                            {{ user_obj.get_role_display }}
-                        </span>
-                    </td>
-                    <td class="p-4 text-slate-600 font-medium text-sm">
-                        {{ user_obj.phone_number|default:"—" }}
-                    </td>
-                    <td class="p-4">
-                        {% if user_obj.is_active %}
-                            <div class="flex items-center text-emerald-600 text-xs font-bold">
-                                <span class="w-2 h-2 bg-emerald-500 rounded-full mr-2"></span> Active
-                            </div>
-                        {% else %}
-                            <div class="flex items-center text-slate-400 text-xs font-bold">
-                                <span class="w-2 h-2 bg-slate-300 rounded-full mr-2"></span> Inactive
-                            </div>
-                        {% endif %}
-                    </td>
-                    <td class="p-4 text-right">
-                        <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <a href="{% url 'accounts:user_edit' user_obj.pk %}" class="p-2 hover:bg-white/60 text-slate-500 hover:text-indigo-600 rounded-xl transition" title="Edit User">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                            </a>
-                            {% if user_obj != request.user %}
-                            <a href="{% url 'accounts:user_delete' user_obj.pk %}" class="p-2 hover:bg-rose-50 text-slate-400 hover:text-rose-600 rounded-xl transition" title="Delete User">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                            </a>
-                            {% endif %}
-                        </div>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="5" class="p-12 text-center text-slate-400">
-                        <svg class="w-12 h-12 mx-auto mb-4 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                        No users found matching your criteria.
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="p-12 text-center text-slate-400">
+                            <svg class="w-12 h-12 mx-auto mb-4 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                            No users found matching your criteria.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
     
-    {% if is_paginated %}
-    <div class="bg-indigo-50/30 p-4 border-t border-indigo-100 flex justify-center gap-4">
-        {% if page_obj.has_previous %}
-            <a href="?page={{ page_obj.previous_page_number }}{% if current_role %}&role={{ current_role }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" class="glass-btn px-4 py-2 rounded-xl text-sm font-bold">Previous</a>
-        {% endif %}
-        <span class="py-2 text-sm font-bold text-slate-500">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
-        {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}{% if current_role %}&role={{ current_role }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" class="glass-btn px-4 py-2 rounded-xl text-sm font-bold">Next</a>
-        {% endif %}
-    </div>
-    {% endif %}
+    {% include 'includes/pagination.html' %}
 </div>
 {% endblock %}

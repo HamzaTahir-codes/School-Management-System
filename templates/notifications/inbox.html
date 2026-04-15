@@ -42,8 +42,7 @@
     </div>
 
     <!-- Messages List -->
-    <div class="space-y-6 px-4">
-
+    <div id="list-container" class="animate-fade-in space-y-6 px-4">
         {% if current_tab == 'sent' %}
         <h2 class="text-lg font-bold text-slate-800 mb-4 px-2">Sent Announcements</h2>
         {% for item in sent_broadcasts %}
@@ -274,25 +273,7 @@
         {% endfor %}
 
         <!-- Pagination Controls -->
-        {% if is_paginated %}
-        <div class="flex items-center justify-center gap-2 mt-10 py-6 border-t border-slate-100">
-            {% if page_obj.has_previous %}
-            <a href="?tab={{ current_tab }}&page={{ page_obj.previous_page_number }}"
-                class="px-4 py-2 bg-white rounded-xl border border-slate-200 text-sm font-bold text-slate-600 hover:bg-indigo-50 transition"
-                style="text-decoration:none;">Previous</a>
-            {% endif %}
-
-            <span class="text-sm font-bold text-slate-400 px-4">
-                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
-            </span>
-
-            {% if page_obj.has_next %}
-            <a href="?tab={{ current_tab }}&page={{ page_obj.next_page_number }}"
-                class="px-4 py-2 bg-white rounded-xl border border-slate-200 text-sm font-bold text-slate-600 hover:bg-indigo-50 transition"
-                style="text-decoration:none;">Next</a>
-            {% endif %}
-        </div>
-        {% endif %}
+        {% include 'includes/pagination.html' %}
 
         {% endif %}
     </div>

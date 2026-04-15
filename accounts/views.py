@@ -76,11 +76,60 @@ def dashboard_view(request):
             
             # Check if attendance marked today
             today = timezone.localtime().date()
+            now_time = timezone.localtime().time()
+            today_name = today.strftime('%A').upper()
+            
             context['attendance_marked_today'] = TeacherAttendance.objects.filter(
                 teacher=profile, 
                 date=today,
                 is_present=True
             ).exists()
+
+            # --- Timetable Integration ---
+            from timetable.models import TimetableEntry, WorkdayOverride, AttendanceExtension
+            
+            # Check if it's a working day
+            is_sunday = today_name == 'SUNDAY'
+            is_saturday = today_name == 'SATURDAY'
+            override = WorkdayOverride.objects.filter(date=today).first()
+            
+            is_working = True
+            if override:
+                is_working = override.is_working
+            elif is_sunday:
+                is_working = False
+            elif is_saturday:
+                is_working = False # Saturdays OFF by default per user request
+            
+            context['is_working_day'] = is_working
+            
+            if is_working:
+                # Find if teacher has an attendance period right now
+                att_entry = TimetableEntry.objects.filter(
+                    day=today_name,
+                    assignment__teacher=profile,
+                    is_attendance_period=True
+                ).select_related('timeslot', 'assignment__section').first()
+                
+                if att_entry:
+                    context['attendance_section'] = att_entry.assignment.section
+                    context['attendance_slot'] = att_entry.timeslot
+                    
+                    # Time window check
+                    is_in_window = att_entry.timeslot.start_time <= now_time <= att_entry.timeslot.end_time
+                    
+                    # Extension check
+                    has_extension = AttendanceExtension.objects.filter(
+                        teacher=profile,
+                        section=att_entry.assignment.section,
+                        date=today,
+                        is_approved=True,
+                        expires_at__gt=timezone.now()
+                    ).exists()
+                    
+                    context['can_mark_students'] = is_in_window or has_extension
+                    context['needs_extension'] = not is_in_window and not has_extension
+                
         except TeacherProfile.DoesNotExist:
             messages.warning(request, "Teacher profile not found. Please contact admin.")
 
@@ -122,7 +171,7 @@ class UserListView(LoginRequiredMixin, AdminRequiredMixin, ListView):
     model = User
     template_name = 'accounts/user_list.html'
     context_object_name = 'users_list'
-    paginate_by = 20
+    paginate_by = 10
 
     def get_queryset(self):
         queryset = super().get_queryset()
