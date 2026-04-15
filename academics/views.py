@@ -27,6 +27,7 @@ class SessionListView(LoginRequiredMixin, AdminRequiredMixin, ListView):
     model = AcademicSession
     template_name = 'academics/session_list.html'
     context_object_name = 'sessions'
+    paginate_by = 10
 
 class SessionCreateView(LoginRequiredMixin, AdminRequiredMixin, CreateView):
     model = AcademicSession
@@ -69,6 +70,7 @@ class ClassListView(LoginRequiredMixin, AdminRequiredMixin, ListView):
     model = ClassLevel
     template_name = 'academics/class_list.html'
     context_object_name = 'classes'
+    paginate_by = 10
 
 class ClassCreateView(LoginRequiredMixin, AdminRequiredMixin, CreateView):
     model = ClassLevel
@@ -108,6 +110,7 @@ class SectionListView(LoginRequiredMixin, AdminRequiredMixin, ListView):
     model = Section
     template_name = 'academics/section_list.html'
     context_object_name = 'sections'
+    paginate_by = 10
 
 class SectionCreateView(LoginRequiredMixin, AdminRequiredMixin, CreateView):
     model = Section
@@ -147,6 +150,7 @@ class SubjectListView(LoginRequiredMixin, AdminRequiredMixin, ListView):
     model = Subject
     template_name = 'academics/subject_list.html'
     context_object_name = 'subjects'
+    paginate_by = 10
 
 class SubjectCreateView(LoginRequiredMixin, AdminRequiredMixin, CreateView):
     model = Subject
@@ -186,6 +190,7 @@ class AssignmentListView(LoginRequiredMixin, AdminRequiredMixin, ListView):
     model = TeacherAssignment
     template_name = 'academics/assignment_list.html'
     context_object_name = 'assignments'
+    paginate_by = 10
     def get_queryset(self):
         return TeacherAssignment.objects.select_related('teacher__user', 'class_level', 'section', 'subject', 'academic_session').all()
 

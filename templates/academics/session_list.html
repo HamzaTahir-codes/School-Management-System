@@ -14,38 +14,42 @@
     </a>
 </div>
 
-<div class="glass-card p-2 rounded-3xl overflow-hidden border border-white/60">
-    <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-            <thead>
-                <tr class="border-b border-indigo-100 bg-indigo-50/50">
-                    <th class="p-4 font-semibold text-slate-700">Session Name</th>
-                    <th class="p-4 font-semibold text-slate-700">Start Date</th>
-                    <th class="p-4 font-semibold text-slate-700">End Date</th>
-                    <th class="p-4 font-semibold text-slate-700 w-32">Status</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-indigo-50">
-                {% for session in sessions %}
-                <tr class="hover:bg-white/40 transition-colors">
-                    <td class="p-4 font-bold text-slate-800">{{ session.name }}</td>
-                    <td class="p-4 text-slate-600">{{ session.start_date }}</td>
-                    <td class="p-4 text-slate-600">{{ session.end_date }}</td>
-                    <td class="p-4">
-                        {% if session.is_current %}
-                        <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold border border-green-200">Current</span>
-                        {% else %}
-                        <span class="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-semibold border border-slate-200">Inactive</span>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="4" class="p-8 text-center text-slate-500">No sessions registered yet.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+<div id="list-container" class="animate-fade-in">
+    <div class="glass-card p-2 rounded-3xl overflow-hidden border border-white/60">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="border-b border-indigo-100 bg-indigo-50/50">
+                        <th class="p-4 font-semibold text-slate-700">Session Name</th>
+                        <th class="p-4 font-semibold text-slate-700">Start Date</th>
+                        <th class="p-4 font-semibold text-slate-700">End Date</th>
+                        <th class="p-4 font-semibold text-slate-700 w-32">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-indigo-50">
+                    {% for session in sessions %}
+                    <tr class="hover:bg-white/40 transition-colors">
+                        <td class="p-4 font-bold text-slate-800">{{ session.name }}</td>
+                        <td class="p-4 text-slate-600">{{ session.start_date }}</td>
+                        <td class="p-4 text-slate-600">{{ session.end_date }}</td>
+                        <td class="p-4">
+                            {% if session.is_current %}
+                            <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold border border-green-200">Current</span>
+                            {% else %}
+                            <span class="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-semibold border border-slate-200">Inactive</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="p-8 text-center text-slate-500">No sessions registered yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
+
+    {% include 'includes/pagination.html' %}
 </div>
 {% endblock %}

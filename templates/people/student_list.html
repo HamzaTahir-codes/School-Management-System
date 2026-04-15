@@ -14,35 +14,39 @@
     </a>
 </div>
 
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    {% for student in students %}
-    <a href="{% url 'people:student_detail' student.pk %}" class="glass-card rounded-2xl p-6 relative block" style="text-decoration:none;">
-        <div class="absolute top-4 right-4 bg-purple-100 text-purple-700 text-xs font-semibold px-2 py-1 rounded-lg shadow-sm">{{ student.status|default:"Active" }}</div>
-        {% if student.profile_picture %}
-            <img src="{{ student.profile_picture.url }}" alt="{{ student.get_full_name }}" class="w-16 h-16 rounded-2xl object-cover mb-4 shadow-sm border border-purple-100">
-        {% else %}
-            <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-purple-100 to-purple-50 mb-4 flex items-center justify-center text-purple-600 font-bold text-xl shadow-sm border border-purple-100">
-                {{ student.first_name|first|upper }}
+<div id="list-container" class="animate-fade-in">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for student in students %}
+        <a href="{% url 'people:student_detail' student.pk %}" class="glass-card rounded-2xl p-6 relative block" style="text-decoration:none;">
+            <div class="absolute top-4 right-4 bg-purple-100 text-purple-700 text-xs font-semibold px-2 py-1 rounded-lg shadow-sm">{{ student.status|default:"Active" }}</div>
+            {% if student.profile_picture %}
+                <img src="{{ student.profile_picture.url }}" alt="{{ student.get_full_name }}" class="w-16 h-16 rounded-2xl object-cover mb-4 shadow-sm border border-purple-100">
+            {% else %}
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-purple-100 to-purple-50 mb-4 flex items-center justify-center text-purple-600 font-bold text-xl shadow-sm border border-purple-100">
+                    {{ student.first_name|first|upper }}
+                </div>
+            {% endif %}
+            <h3 class="text-lg font-bold text-slate-800">{{ student.get_full_name }}</h3>
+            <div class="mt-4 grid grid-cols-2 gap-2 text-sm border-t border-slate-200/50 pt-3">
+                <div>
+                    <span class="text-slate-400 block text-xs">Class</span>
+                    <span class="text-slate-700 font-medium">{{ student.class_level }}</span>
+                </div>
+                <div>
+                    <span class="text-slate-400 block text-xs">Roll #</span>
+                    <span class="text-slate-700 font-medium">{{ student.roll_number }}</span>
+                </div>
             </div>
-        {% endif %}
-        <h3 class="text-lg font-bold text-slate-800">{{ student.get_full_name }}</h3>
-        <div class="mt-4 grid grid-cols-2 gap-2 text-sm border-t border-slate-200/50 pt-3">
-            <div>
-                <span class="text-slate-400 block text-xs">Class</span>
-                <span class="text-slate-700 font-medium">{{ student.class_level }}</span>
-            </div>
-            <div>
-                <span class="text-slate-400 block text-xs">Roll #</span>
-                <span class="text-slate-700 font-medium">{{ student.roll_number }}</span>
-            </div>
+        </a>
+        {% empty %}
+        <div class="col-span-full text-center py-16 px-6 glass-card rounded-3xl border border-dashed border-slate-300">
+            <div class="text-slate-400 mb-3"><svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 14l9-5-9-5-9 5 9 5z"></path></svg></div>
+            <p class="text-slate-600 font-medium text-lg">No students enrolled</p>
+            <p class="text-slate-500 text-sm mt-1">Enroll your first student into the system.</p>
         </div>
-    </a>
-    {% empty %}
-    <div class="col-span-full text-center py-16 px-6 glass-card rounded-3xl border border-dashed border-slate-300">
-        <div class="text-slate-400 mb-3"><svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 14l9-5-9-5-9 5 9 5z"></path></svg></div>
-        <p class="text-slate-600 font-medium text-lg">No students enrolled</p>
-        <p class="text-slate-500 text-sm mt-1">Enroll your first student into the system.</p>
+        {% endfor %}
     </div>
-    {% endfor %}
+
+    {% include 'includes/pagination.html' %}
 </div>
 {% endblock %}

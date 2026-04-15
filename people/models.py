@@ -97,7 +97,7 @@ class StudentProfile(models.Model):
         }
 
     def __str__(self):
-        return f"{self.get_full_name()} - {self.class_level}"
+        return f"{self.get_full_name} - {self.class_level}"
 
 # Add to TeacherProfile
 # (I will add them below the TeacherProfile class definition)

@@ -70,6 +70,7 @@ class TeacherListView(LoginRequiredMixin, AdminRequiredMixin, ListView):
     model = TeacherProfile
     template_name = 'people/teacher_list.html'
     context_object_name = 'teachers'
+    paginate_by = 10
 
 
 class TeacherCreateView(BaseProfileCreateView):
@@ -170,6 +171,7 @@ class ParentListView(LoginRequiredMixin, AdminRequiredMixin, ListView):
     model = ParentProfile
     template_name = 'people/parent_list.html'
     context_object_name = 'parents'
+    paginate_by = 10
 
 
 class ParentCreateView(BaseProfileCreateView):
@@ -187,7 +189,7 @@ class ParentDetailView(LoginRequiredMixin, AdminRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['children'] = StudentProfile.objects.filter(parent=self.object).select_related('user', 'class_level', 'section')
+        context['children'] = StudentProfile.objects.filter(parent=self.object).select_related('class_level', 'section')
         from fees.models import StudentFeePayment
         child_ids = context['children'].values_list('id', flat=True)
         context['payments'] = StudentFeePayment.objects.filter(student_id__in=child_ids).order_by('-payment_date')[:10]
@@ -263,6 +265,7 @@ class StudentListView(LoginRequiredMixin, AdminRequiredMixin, ListView):
     model = StudentProfile
     template_name = 'people/student_list.html'
     context_object_name = 'students'
+    paginate_by = 10
 
 
 class StudentCreateView(LoginRequiredMixin, AdminRequiredMixin, CreateView):
@@ -305,7 +308,7 @@ class StudentUpdateView(LoginRequiredMixin, AdminRequiredMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = f'Edit Student: {self.object.get_full_name()}'
+        context['title'] = f'Edit Student: {self.object.get_full_name}'
         context['back_url'] = reverse_lazy('people:student_detail', kwargs={'pk': self.object.pk})
         return context
 
@@ -323,7 +326,7 @@ class StudentDeleteView(LoginRequiredMixin, AdminRequiredMixin, DeleteView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Delete Student'
-        context['name'] = self.object.get_full_name()
+        context['name'] = self.object.get_full_name
         context['back_url'] = reverse_lazy('people:student_detail', kwargs={'pk': self.object.pk})
         return context
 
