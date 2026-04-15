@@ -14,38 +14,42 @@
     </a>
 </div>
 
-<div class="glass-card p-2 rounded-3xl overflow-hidden border border-white/60">
-    <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-            <thead>
-                <tr class="border-b border-indigo-100 bg-indigo-50/50">
-                    <th class="p-4 font-semibold text-slate-700">Student Name</th>
-                    <th class="p-4 font-semibold text-slate-700">Date</th>
-                    <th class="p-4 font-semibold text-slate-700">Status</th>
-                    <th class="p-4 font-semibold text-slate-700">Homeroom/Teacher</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-indigo-50">
-                {% for record in records %}
-                <tr class="hover:bg-white/40 transition-colors">
-                    <td class="p-4 font-bold text-slate-800">{{ record.student.get_full_name }}</td>
-                    <td class="p-4 text-slate-600 font-medium">{{ record.date }}</td>
-                    <td class="p-4">
-                        {% if record.is_present %}
-                        <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold border border-green-200">Present</span>
-                        {% else %}
-                        <span class="px-3 py-1 bg-rose-100 text-rose-700 rounded-full text-xs font-bold border border-rose-200">Absent</span>
-                        {% endif %}
-                    </td>
-                    <td class="p-4 text-slate-500 text-sm">{{ record.teacher.user.get_full_name|default:"-" }}</td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="4" class="p-8 text-center text-slate-500">No student attendance logs available.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+<div id="list-container" class="animate-fade-in">
+    <div class="glass-card p-2 rounded-3xl overflow-hidden border border-white/60">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="border-b border-indigo-100 bg-indigo-50/50">
+                        <th class="p-4 font-semibold text-slate-700">Student Name</th>
+                        <th class="p-4 font-semibold text-slate-700">Date</th>
+                        <th class="p-4 font-semibold text-slate-700">Status</th>
+                        <th class="p-4 font-semibold text-slate-700">Homeroom/Teacher</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-indigo-50">
+                    {% for record in records %}
+                    <tr class="hover:bg-white/40 transition-colors">
+                        <td class="p-4 font-bold text-slate-800">{{ record.student.get_full_name }}</td>
+                        <td class="p-4 text-slate-600 font-medium">{{ record.date }}</td>
+                        <td class="p-4">
+                            {% if record.is_present %}
+                            <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold border border-green-200">Present</span>
+                            {% else %}
+                            <span class="px-3 py-1 bg-rose-100 text-rose-700 rounded-full text-xs font-bold border border-rose-200">Absent</span>
+                            {% endif %}
+                        </td>
+                        <td class="p-4 text-slate-500 text-sm">{{ record.teacher.user.get_full_name|default:"-" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="p-8 text-center text-slate-500">No student attendance logs available.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
+
+    {% include 'includes/pagination.html' %}
 </div>
 {% endblock %}

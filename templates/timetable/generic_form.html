@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title|default:"Timetable Management" }}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto w-full px-4">
+    <div class="mb-8 animate-slide-up">
+        <a href="{{ back_url|default:'#' }}" onclick="window.history.back(); return false;" class="flex items-center gap-2 text-slate-500 hover:text-indigo-600 transition mb-4 group">
+            <svg class="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+            Back to List
+        </a>
+        <h1 class="text-4xl font-black text-slate-800 tracking-tight">{{ title|default:"Manage Timetable" }}</h1>
+        <p class="text-slate-500 mt-2">Please fill in the details below.</p>
+    </div>
+
+    <div class="glass-panel p-8 rounded-3xl border border-white/60 shadow-2xl animate-scale-up">
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            <div class="grid grid-cols-1 gap-6">
+                {% for field in form %}
+                <div class="space-y-2">
+                    <label for="{{ field.id_for_label }}" class="text-sm font-bold text-slate-700 block ml-1 uppercase tracking-wider">
+                        {{ field.label }}
+                    </label>
+                    <div class="relative">
+                        {% if field.field.widget.input_type == 'checkbox' %}
+                            <div class="flex items-center gap-3 p-4 bg-white/50 border border-slate-200 rounded-2xl">
+                                {{ field }}
+                                <span class="text-sm text-slate-600">{{ field.help_text|default:"Enabled" }}</span>
+                            </div>
+                        {% else %}
+                            {{ field }}
+                        {% endif %}
+                    </div>
+                    {% if field.errors %}
+                        <p class="text-rose-500 text-xs font-bold mt-1 ml-1">{{ field.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="pt-6 border-t border-slate-200/50 flex gap-4">
+                <button type="submit" class="flex-grow py-4 bg-indigo-600 text-white rounded-2xl font-bold hover:bg-white hover:text-indigo-600 border-2 border-transparent hover:border-indigo-600 transition shadow-lg shadow-indigo-100 flex items-center justify-center gap-2 group">
+                    <span>Save Changes</span>
+                    <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 12h15"></path></svg>
+                </button>
+                <a href="{{ back_url|default:'#' }}" onclick="window.history.back(); return false;" class="px-8 py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold hover:bg-slate-200 transition">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    input:not([type="checkbox"]), select, textarea {
+        width: 100%;
+        padding: 1rem 1.25rem;
+        background: rgba(255, 255, 255, 0.5);
+        border: 2px solid rgba(226, 232, 240, 0.8);
+        border-radius: 1rem;
+        font-size: 1rem;
+        font-weight: 500;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        color: #1e293b;
+    }
+
+    input:focus, select:focus, textarea:focus {
+        background: white;
+        border-color: #6366f1;
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1), 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        transform: translateY(-1px);
+    }
+
+    label {
+        letter-spacing: 0.05em;
+    }
+</style>
+{% endblock %}

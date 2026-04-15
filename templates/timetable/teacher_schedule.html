@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}My Schedule - SchoolOS{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto w-full px-4">
+    <div class="mb-10 animate-slide-up">
+        <h1 class="text-4xl font-black text-slate-800 tracking-tight">My Weekly Schedule</h1>
+        <p class="text-slate-500 mt-2">View your assigned classes and subjects for the current session.</p>
+    </div>
+
+    {% if not grid %}
+    <div class="py-20 text-center glass-panel rounded-3xl border border-white/60 shadow-xl">
+        <div class="w-20 h-20 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+        </div>
+        <h3 class="text-xl font-bold text-slate-800">No Assignments Found</h3>
+        <p class="text-slate-500">You don't have any entries in the active timetable.</p>
+    </div>
+    {% else %}
+    <div class="glass-panel rounded-3xl overflow-hidden border border-white/60 shadow-2xl animate-scale-up">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse table-fixed min-w-[800px]">
+                <thead>
+                    <tr class="bg-white border-b border-slate-200">
+                        <th class="w-48 px-6 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest border-r border-slate-100 bg-slate-50/50">Time Slot</th>
+                        {% for day_code, day_name in day_names %}
+                        <th class="px-6 py-6 text-[10px] font-black {% if day_code == today_name %}text-indigo-600 bg-indigo-50/30{% else %}text-slate-500{% endif %} uppercase tracking-widest text-center">
+                            {{ day_name }}
+                        </th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    {% for row in grid %}
+                    <tr>
+                        <td class="px-6 py-8 border-r border-slate-100 bg-white/40">
+                            <div class="flex flex-col">
+                                <span class="text-xs font-black text-slate-400 uppercase tracking-widest">{{ row.slot.label }}</span>
+                                <span class="text-[10px] font-black text-indigo-500 tabular-nums">{{ row.slot.start_time|time:"H:i" }}</span>
+                            </div>
+                        </td>
+
+                        {% for d in row.days %}
+                        <td class="p-2 border-r border-slate-100">
+                            {% if d.entry %}
+                            <div class="p-4 rounded-2xl border-2 transition-all h-full flex flex-col justify-center text-center
+                                {% if d.day_code == today_name %} border-indigo-200 bg-indigo-50/50 shadow-sm {% else %} border-slate-50 bg-white/50 {% endif %}">
+                                <div class="text-xs font-black text-slate-800 leading-tight mb-1">{{ d.entry.assignment.subject.name }}</div>
+                                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{{ d.entry.assignment.section }}</div>
+                                
+                                {% if d.entry.is_attendance_period %}
+                                <div class="mt-2 flex items-center justify-center gap-1 text-[8px] font-black text-emerald-600 uppercase tracking-widest">
+                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                                    Registration
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% elif d.substitution %}
+                            <div class="p-4 rounded-2xl border-2 border-dashed border-orange-200 bg-orange-50/50 flex flex-col justify-center text-center">
+                                <span class="text-[8px] font-black text-orange-600 uppercase tracking-widest mb-1">Substitution</span>
+                                <div class="text-xs font-black text-slate-800 leading-tight mb-1">{{ d.substitution.entry.assignment.subject.name }}</div>
+                                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{{ d.substitution.entry.assignment.section }}</div>
+                            </div>
+                            {% else %}
+                            <div class="h-full flex items-center justify-center opacity-10 py-8">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 12H6"></path></svg>
+                            </div>
+                            {% endif %}
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -14,49 +14,53 @@
     </a>
 </div>
 
-<div class="glass-card p-2 rounded-3xl overflow-hidden border border-white/60">
-    <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-            <thead>
-                <tr class="border-b border-indigo-100 bg-indigo-50/50">
-                    <th class="p-4 font-semibold text-slate-700">Teacher</th>
-                    <th class="p-4 font-semibold text-slate-700">Date</th>
-                    <th class="p-4 font-semibold text-slate-700">Status</th>
-                    <th class="p-4 font-semibold text-slate-700">Method</th>
-                    <th class="p-4 font-semibold text-slate-700">Details (Time / IP)</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-indigo-50">
-                {% for record in records %}
-                <tr class="hover:bg-white/40 transition-colors">
-                    <td class="p-4 font-bold text-slate-800">{{ record.teacher.user.get_full_name }}</td>
-                    <td class="p-4 text-slate-600 font-medium">{{ record.date }}</td>
-                    <td class="p-4">
-                        {% if record.is_present %}
-                        <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold border border-green-200">Present</span>
-                        {% else %}
-                        <span class="px-3 py-1 bg-rose-100 text-rose-700 rounded-full text-xs font-bold border border-rose-200">Absent</span>
-                        {% endif %}
-                    </td>
-                    <td class="p-4">
-                        {% if record.verified_by_otp %}
-                        <span class="px-2 py-1 bg-indigo-100 text-indigo-700 rounded-lg text-xs font-bold border border-indigo-200 flex items-center w-fit"><svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> OTP Verified</span>
-                        {% else %}
-                        <span class="px-2 py-1 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold border border-slate-200">System/Manual</span>
-                        {% endif %}
-                    </td>
-                    <td class="p-4 text-slate-500 text-sm">
-                        {% if record.time_marked %}{{ record.time_marked|time:"H:i A" }}{% endif %}
-                        <span class="block text-xs text-slate-400 mt-1">{% if record.ip_address %}{{ record.ip_address }}{% endif %}</span>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="4" class="p-8 text-center text-slate-500">No attendance logs available.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+<div id="list-container" class="animate-fade-in">
+    <div class="glass-card p-2 rounded-3xl overflow-hidden border border-white/60">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="border-b border-indigo-100 bg-indigo-50/50">
+                        <th class="p-4 font-semibold text-slate-700">Teacher</th>
+                        <th class="p-4 font-semibold text-slate-700">Date</th>
+                        <th class="p-4 font-semibold text-slate-700">Status</th>
+                        <th class="p-4 font-semibold text-slate-700">Method</th>
+                        <th class="p-4 font-semibold text-slate-700">Details (Time / IP)</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-indigo-50">
+                    {% for record in records %}
+                    <tr class="hover:bg-white/40 transition-colors">
+                        <td class="p-4 font-bold text-slate-800">{{ record.teacher.user.get_full_name }}</td>
+                        <td class="p-4 text-slate-600 font-medium">{{ record.date }}</td>
+                        <td class="p-4">
+                            {% if record.is_present %}
+                            <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold border border-green-200">Present</span>
+                            {% else %}
+                            <span class="px-3 py-1 bg-rose-100 text-rose-700 rounded-full text-xs font-bold border border-rose-200">Absent</span>
+                            {% endif %}
+                        </td>
+                        <td class="p-4">
+                            {% if record.verified_by_otp %}
+                            <span class="px-2 py-1 bg-indigo-100 text-indigo-700 rounded-lg text-xs font-bold border border-indigo-200 flex items-center w-fit"><svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> OTP Verified</span>
+                            {% else %}
+                            <span class="px-2 py-1 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold border border-slate-200">System/Manual</span>
+                            {% endif %}
+                        </td>
+                        <td class="p-4 text-slate-500 text-sm">
+                            {% if record.time_marked %}{{ record.time_marked|time:"H:i A" }}{% endif %}
+                            <span class="block text-xs text-slate-400 mt-1">{% if record.ip_address %}{{ record.ip_address }}{% endif %}</span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="p-8 text-center text-slate-500">No attendance logs available.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
+
+    {% include 'includes/pagination.html' %}
 </div>
 {% endblock %}

@@ -244,6 +244,31 @@ function verifyAttendance() {
         btn.innerText = "Verify & Submit";
     });
 }
+
+function requestExtension(sectionId) {
+    if(confirm("Are you sure you want to request an attendance extension from the admin?")) {
+        fetch("{% url 'timetable:request_extension' %}", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": getCSRFToken(),
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: new URLSearchParams({
+                'section_id': sectionId,
+                'duration': 15
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.success) {
+                showToast("Request Sent", data.message);
+                location.reload();
+            } else {
+                showToast("Error", data.error, "error");
+            }
+        });
+    }
+}
 </script>
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
@@ -266,9 +291,22 @@ function verifyAttendance() {
                     </div>
                 </div>
                 <div class="flex gap-2">
-                    <a href="{% url 'attendance:student_attendance_list' %}?class={{ assignment.class_level.pk }}&section={{ assignment.section.pk }}" class="p-2 hover:bg-indigo-50 text-indigo-600 rounded-lg transition" title="Mark Attendance">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
-                    </a>
+                    {% if is_working_day %}
+                        {% if attendance_section.pk == assignment.section.pk %}
+                            {% if can_mark_students %}
+                            <a href="{% url 'attendance:mark_students' %}?class={{ assignment.class_level.pk }}&section={{ assignment.section.pk }}" class="flex items-center gap-2 px-4 py-2 bg-emerald-100 text-emerald-700 rounded-xl text-xs font-bold hover:bg-emerald-200 transition" title="Mark Attendance">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                                Mark Attendance
+                            </a>
+                            {% elif needs_extension %}
+                            <button onclick="requestExtension('{{ assignment.section.pk }}')" class="flex items-center gap-2 px-4 py-2 bg-rose-100 text-rose-700 rounded-xl text-xs font-bold hover:bg-rose-200 transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                Request Extension
+                            </button>
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                    
                     <a href="{% url 'grading:mark_add' %}" class="p-2 hover:bg-purple-50 text-purple-600 rounded-lg transition" title="Enter Marks">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 012.828 0L20 7.586a2 2 0 010 2.828l-9.828 9.828l-4 1l1-4L16.586 3.414z"></path></svg>
                     </a>

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Attendance Extensions - SchoolOS{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto w-full px-4">
+    <div class="mb-10 animate-slide-up">
+        <h1 class="text-4xl font-black text-slate-800 tracking-tight">Attendance Extensions</h1>
+        <p class="text-slate-500 mt-2">Approve or reject requests from teachers for extra time to mark attendance.</p>
+    </div>
+
+    <div id="list-container" class="animate-fade-in">
+        <div class="glass-panel rounded-3xl overflow-hidden border border-white/60 shadow-2xl">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-white border-b border-slate-200">
+                            <th class="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest">Teacher</th>
+                            <th class="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest">Section</th>
+                            <th class="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest">Duration</th>
+                            <th class="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest">Expires At</th>
+                            <th class="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest">Status</th>
+                            <th class="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 italic font-medium">
+                        {% for ext in extensions %}
+                        <tr class="hover:bg-slate-50/50 transition-colors">
+                            <td class="px-8 py-6">
+                                <div class="font-bold text-slate-800 not-italic">{{ ext.teacher }}</div>
+                                <div class="text-[10px] text-slate-400 uppercase">{{ ext.date|date:"M d, Y" }}</div>
+                            </td>
+                            <td class="px-8 py-6 text-slate-600">{{ ext.section }}</td>
+                            <td class="px-8 py-6">
+                                 <span class="px-2 py-1 bg-indigo-50 text-indigo-600 rounded text-xs font-black">+{{ ext.duration_minutes }}m</span>
+                            </td>
+                            <td class="px-8 py-6 text-slate-500 tabular-nums text-sm">{{ ext.expires_at|time:"H:i" }}</td>
+                            <td class="px-8 py-6">
+                                {% if ext.is_approved %}
+                                    <span class="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-[10px] font-black uppercase tracking-wider">Approved</span>
+                                {% else %}
+                                    <span class="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-[10px] font-black uppercase tracking-wider animate-pulse">Pending</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-8 py-6 text-right">
+                                {% if not ext.is_approved %}
+                                <a href="{% url 'timetable:approve_extension' ext.pk %}" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-black hover:bg-slate-800 transition">Approve</a>
+                                {% else %}
+                                    <span class="text-slate-300 italic text-xs">Verified</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="px-8 py-20 text-center text-slate-400">No extension requests found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {% include 'includes/pagination.html' %}
+    </div>
+</div>
+{% endblock %}

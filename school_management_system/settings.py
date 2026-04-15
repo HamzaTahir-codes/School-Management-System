@@ -67,6 +67,7 @@ TENANT_APPS = [
     'notifications',
     'core',
     'contact',
+    'timetable',
 ]
 
 INSTALLED_APPS = list(set(SHARED_APPS + TENANT_APPS))

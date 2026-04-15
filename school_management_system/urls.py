@@ -36,6 +36,9 @@ urlpatterns = [
     # ====================== AI ASSISTANT ======================
     path('ai/', include('ai_assistant.urls', namespace='ai')),
 
+    # ====================== TIMETABLE ======================
+    path('timetable/', include('timetable.urls', namespace='timetable')),
+
     # ====================== CERTIFICATES ======================
     path('certificates/', include('certificates.urls', namespace='certificates')),
 

@@ -3,7 +3,7 @@ from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import TeacherAttendance, StudentAttendance, LeaveRequest, AttendanceSettings, TeacherAttendanceOTP
 from .forms import TeacherAttendanceForm, StudentAttendanceForm, LeaveRequestForm, AttendanceSettingsForm
 from django.http import JsonResponse
@@ -40,6 +40,7 @@ class TeacherAttendanceListView(LoginRequiredMixin, AdminRequiredMixin, ListView
     model = TeacherAttendance
     template_name = 'attendance/teacher_attendance_list.html'
     context_object_name = 'records'
+    paginate_by = 10
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx['title'] = 'Teacher Attendance'
@@ -177,10 +178,119 @@ class StudentAttendanceListView(LoginRequiredMixin, AdminRequiredMixin, ListView
     model = StudentAttendance
     template_name = 'attendance/student_attendance_list.html'
     context_object_name = 'records'
+    paginate_by = 10
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx['title'] = 'Student Attendance'
         return ctx
+
+# --- Teacher-Led Student Attendance (Timetable Integrated) ---
+@login_required
+def mark_students_attendance(request):
+    """
+    Highly secure and timetable-integrated marking view.
+    Ensures:
+    1. Teacher is authorized (assigned to this section/day as Attendance period).
+    2. Today is a working day.
+    3. Current time is within the Slot duration OR an extension exists.
+    """
+    if getattr(request.user, 'role', '') != 'TEACHER':
+        messages.error(request, "Only teachers can access the marking portal.")
+        return redirect('accounts:dashboard')
+
+    from academics.models import Section, ClassLevel
+    from people.models import StudentProfile
+    from timetable.models import TimetableEntry, WorkdayOverride, AttendanceExtension
+    
+    class_pk = request.GET.get('class')
+    section_pk = request.GET.get('section')
+    
+    if not class_pk or not section_pk:
+        messages.error(request, "Invalid class or section selected.")
+        return redirect('accounts:dashboard')
+        
+    section = get_object_or_404(Section, pk=section_pk)
+    profile = request.user.teacher_profile
+    today = timezone.localtime().date()
+    now_time = timezone.localtime().time()
+    today_name = today.strftime('%A').upper()
+    
+    # --- 1. Authorized Check ---
+    # Find the Timetable entry for this teacher, section, and day which is designated as Attendance period
+    att_entry = TimetableEntry.objects.filter(
+        day=today_name,
+        assignment__teacher=profile,
+        assignment__section=section,
+        is_attendance_period=True
+    ).first()
+    
+    if not att_entry:
+        messages.error(request, f"You are not designated to mark attendance for {section} today.")
+        return redirect('accounts:dashboard')
+        
+    # --- 2. Working Day Check ---
+    is_working = True
+    override = WorkdayOverride.objects.filter(date=today).first()
+    if override:
+        is_working = override.is_working
+    elif today_name in ['SATURDAY', 'SUNDAY']:
+        is_working = False
+        
+    if not is_working:
+        messages.error(request, "Today is marked as a holiday.")
+        return redirect('accounts:dashboard')
+
+    # --- 3. Timing Window Check ---
+    is_in_window = att_entry.timeslot.start_time <= now_time <= att_entry.timeslot.end_time
+    has_extension = AttendanceExtension.objects.filter(
+        teacher=profile,
+        section=section,
+        date=today,
+        is_approved=True,
+        expires_at__gt=timezone.now()
+    ).exists()
+    
+    if not (is_in_window or has_extension):
+        messages.error(request, f"Attendance window ( {att_entry.timeslot.start_time.strftime('%H:%M')} - {att_entry.timeslot.end_time.strftime('%H:%M')} ) has passed.")
+        return redirect('accounts:dashboard')
+
+    # --- 4. Render Grid ---
+    students = StudentProfile.objects.filter(section=section, status='ACTIVE').order_by('roll_number')
+    
+    # Get already marked attendance for today
+    marked_today = StudentAttendance.objects.filter(date=today, student__section=section).values_list('student_id', 'is_present')
+    marked_dict = {s_id: is_p for s_id, is_p in marked_today}
+
+    context = {
+        'section': section,
+        'students': students,
+        'marked_dict': marked_dict,
+        'today': today,
+        'timeslot': att_entry.timeslot
+    }
+    return render(request, 'attendance/mark_students_attendance.html', context)
+
+@login_required
+def toggle_student_attendance(request):
+    """AJAX toggler for the Visual Roll Call grid"""
+    if request.method != 'POST' or getattr(request.user, 'role', '') != 'TEACHER':
+        return JsonResponse({'error': 'Unauthorized'}, status=403)
+        
+    student_id = request.POST.get('student_id')
+    is_present = request.POST.get('is_present') == 'true'
+    today = timezone.localtime().date()
+    
+    from people.models import StudentProfile
+    student = get_object_or_404(StudentProfile, pk=student_id)
+    
+    # Record or Update
+    att, created = StudentAttendance.objects.update_or_create(
+        student=student,
+        date=today,
+        defaults={'is_present': is_present, 'teacher': request.user.teacher_profile}
+    )
+    
+    return JsonResponse({'success': True, 'is_present': att.is_present})
 
 class StudentAttendanceCreateView(LoginRequiredMixin, AdminRequiredMixin, CreateView):
     model = StudentAttendance
@@ -216,6 +326,7 @@ class LeaveRequestListView(LoginRequiredMixin, AdminRequiredMixin, ListView):
     model = LeaveRequest
     template_name = 'attendance/leave_request_list.html'
     context_object_name = 'requests'
+    paginate_by = 10
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx['title'] = 'Leave Requests'
