@@ -1,0 +1,26 @@
+/* static/css/notifications/inbox.css */
+
+.notification-badge {
+    display: none !important;
+}
+
+@keyframes pulse-slow {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.02);
+    }
+}
+
+.animate-pulse-slow {
+    animation: pulse-slow 3s infinite ease-in-out;
+}
+
+/* Smooth transition for read/unread state change */
+.glass-panel,
+div[id^="alert-"] {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}

@@ -1,305 +1,153 @@
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-    <div class="glass-card-stats p-6 rounded-3xl relative overflow-hidden group hover:scale-[1.02] transition-all">
-        <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-indigo-100 rounded-full blur-2xl opacity-40"></div>
-        <div class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">My Students</div>
-        <div class="text-3xl font-extrabold text-slate-800">{{ total_students_managed }}</div>
-        <div class="text-sm text-slate-500 mt-1">Across all sections</div>
-    </div>
-    
-    <div class="glass-card-stats p-6 rounded-3xl relative overflow-hidden group hover:scale-[1.02] transition-all">
-        <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-purple-100 rounded-full blur-2xl opacity-40"></div>
-        <div class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">My Classes</div>
-        <div class="text-3xl font-extrabold text-slate-800">{{ assignments.count }}</div>
-        <div class="text-sm text-slate-500 mt-1">Current Session</div>
+<div id="attendance-config" 
+     data-initiate-url="{% url 'attendance:teacher_attendance_initiate' %}"
+     data-verify-url="{% url 'attendance:teacher_attendance_verify' %}"
+     data-extension-url="{% url 'timetable:request_extension' %}">
+</div>
+
+<!-- Teacher Stats Grid Redesigned -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+    <!-- Large Gradient Card (Teacher Info) -->
+    <div class="lg:col-span-5 relative overflow-hidden rounded-[2rem] p-8 shadow-xl shadow-indigo-500/20 group hover:-translate-y-1 transition-transform duration-500 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white flex flex-col justify-between min-h-[260px]">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-white/20 rounded-full blur-3xl -mr-20 -mt-20 mix-blend-overlay"></div>
+        <div class="absolute bottom-0 left-0 w-full h-1/2 opacity-60">
+            <!-- Decorative wave -->
+            <svg viewBox="0 0 400 100" class="w-full h-full preserve-3d" preserveAspectRatio="none">
+                <path d="M0,50 C100,20 200,80 400,30 L400,100 L0,100 Z" fill="rgba(255,255,255,0.15)"></path>
+                <path d="M0,70 C150,10 250,90 400,40 L400,100 L0,100 Z" fill="rgba(255,255,255,0.2)"></path>
+            </svg>
+        </div>
+        <div class="relative z-10 flex justify-between items-start">
+            <div>
+                <p class="text-white/80 font-bold uppercase tracking-wider text-xs mb-1">Total Mentorship</p>
+                <h2 class="text-5xl font-black tracking-tight">{{ total_students_managed }}</h2>
+            </div>
+            <button class="text-white hover:text-white/70 transition">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 14l9-5-9-5-9 5 9 5z"></path><path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"></path><path d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"></path></svg>
+            </button>
+        </div>
+        <div class="relative z-10 grid grid-cols-2 gap-4 mt-8 pt-6 border-t border-white/20">
+            <div>
+                <p class="text-white/70 text-xs font-bold uppercase mb-1">My Classes</p>
+                <p class="text-xl font-bold">{{ assignments.count }} Sections</p>
+            </div>
+            <div>
+                <p class="text-white/70 text-xs font-bold uppercase mb-1">Term</p>
+                <p class="text-xl font-bold">Current Session</p>
+            </div>
+        </div>
     </div>
 
-    <div class="glass-card-stats p-6 rounded-3xl relative overflow-hidden group transition-all" id="attendance-widget">
-        <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-emerald-100 rounded-full blur-2xl opacity-40"></div>
-        <div class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">My Attendance</div>
+    <!-- Attendance Widget Card -->
+    <div class="lg:col-span-4 bg-white/70 backdrop-blur-xl border border-white rounded-[2rem] p-6 shadow-xl relative group hover:-translate-y-1 transition-transform duration-500 min-h-[260px] flex flex-col justify-between" id="attendance-widget">
+        <div class="flex justify-between items-start mb-4">
+            <div>
+                <p class="text-slate-800 font-extrabold text-lg">My Attendance</p>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Daily Check-in</p>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-500">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+        </div>
         
-        <div id="attendance-default-state" class="{% if attendance_marked_today %}hidden{% endif %}">
-            <button onclick="initiateAttendance()" class="mt-2 w-full py-2 bg-emerald-100 text-emerald-700 rounded-xl font-bold hover:bg-emerald-200 transition text-sm">
-                Mark Today's Attendance
-            </button>
-            <div class="text-xs text-slate-500 mt-2 text-center">Requires school network</div>
-        </div>
-
-        <div id="attendance-otp-state" class="hidden mt-2 space-y-4">
-            <!-- OTP Display Area -->
-            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-center relative overflow-hidden">
-                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Your One-Time Passcode</div>
-                <div id="otp-display" class="text-3xl font-black text-indigo-600 tracking-[0.3em] font-mono">000000</div>
-                <!-- Progress Line -->
-                <div class="absolute bottom-0 left-0 h-1 bg-indigo-500 transition-all duration-1000" id="otp-progress" style="width: 100%"></div>
+        <div class="flex-grow flex flex-col justify-center">
+            <div id="attendance-default-state" class="{% if attendance_marked_today %}hidden{% endif %}">
+                <button onclick="initiateAttendance()" class="w-full py-4 bg-gradient-to-r from-emerald-400 to-teal-500 text-white rounded-xl font-black hover:shadow-lg hover:shadow-emerald-500/30 transition transform hover:-translate-y-0.5 text-lg">
+                    Mark Present
+                </button>
+                <div class="text-xs font-bold text-slate-400 mt-3 text-center uppercase tracking-wider">Requires school network</div>
             </div>
 
-            <div class="flex items-center justify-between px-1">
-                <span class="text-xs font-bold text-slate-500 uppercase">Input Code</span>
-                <span id="otp-timer" class="text-xs font-bold text-indigo-600 tabular-nums">60s</span>
-            </div>
-
-            <input type="text" id="attendance-otp-input" maxlength="6" placeholder="••••••" 
-                class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-xl text-center tracking-[0.5em] font-bold focus:ring-2 focus:ring-indigo-500 transition shadow-inner">
-            
-            <button onclick="verifyAttendance()" class="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition shadow-lg shadow-indigo-200 active:scale-95">
-                Verify & Mark Present
-            </button>
-            <button onclick="initiateAttendance(true)" id="resend-btn" class="w-full text-xs font-bold text-slate-400 hover:text-indigo-600 transition hidden mt-2">
-                Didn't get code? Resend
-            </button>
-        </div>
-
-        <div id="attendance-success-state" class="{% if not attendance_marked_today %}hidden{% endif %} mt-2">
-            <div class="w-full py-4 bg-emerald-50 border border-emerald-200 text-emerald-700 flex flex-col items-center justify-center rounded-2xl font-bold">
-                <div class="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center mb-2">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+            <div id="attendance-otp-state" class="hidden mt-2 space-y-4">
+                <!-- OTP Display Area -->
+                <div class="bg-white border-2 border-indigo-100 rounded-2xl p-4 text-center relative overflow-hidden shadow-inner">
+                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Your Passcode</div>
+                    <div id="otp-display" class="text-3xl font-black text-indigo-600 tracking-[0.3em] font-mono">000000</div>
+                    <!-- Progress Line -->
+                    <div class="absolute bottom-0 left-0 h-1 bg-indigo-500 transition-all duration-1000" id="otp-progress" style="width: 100%"></div>
                 </div>
-                Attendance Verified
+
+                <div class="flex items-center justify-between px-1">
+                    <span class="text-xs font-bold text-slate-500 uppercase">Input Code</span>
+                    <span id="otp-timer" class="text-xs font-bold text-indigo-600 tabular-nums bg-indigo-50 px-2 py-1 rounded-md">60s</span>
+                </div>
+
+                <input type="text" id="attendance-otp-input" maxlength="6" placeholder="••••••" 
+                    class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl text-xl text-center tracking-[0.5em] font-bold focus:border-indigo-500 focus:ring-0 transition shadow-inner">
+                
+                <button onclick="verifyAttendance()" class="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl font-bold hover:shadow-lg hover:shadow-indigo-500/30 transition transform hover:-translate-y-0.5 active:scale-95">
+                    Verify Code
+                </button>
+                <button onclick="initiateAttendance(true)" id="resend-btn" class="w-full text-xs font-bold text-slate-400 hover:text-indigo-600 transition hidden mt-2">
+                    Didn't get code? Resend
+                </button>
             </div>
+
+            <div id="attendance-success-state" class="{% if not attendance_marked_today %}hidden{% endif %} h-full flex flex-col justify-center">
+                <div class="w-full py-6 bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-200 text-emerald-700 flex flex-col items-center justify-center rounded-2xl shadow-inner">
+                    <div class="w-12 h-12 bg-emerald-500 text-white rounded-full flex items-center justify-center mb-3 shadow-lg shadow-emerald-500/30">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                    </div>
+                    <span class="font-black text-lg tracking-tight">Attendance Verified</span>
+                    <span class="text-xs font-semibold text-emerald-600/70 uppercase tracking-widest mt-1">Have a great day!</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Small Stats Stack -->
+    <div class="lg:col-span-3 flex flex-col gap-6">
+        <div class="bg-amber-50/80 backdrop-blur-md border border-amber-100 rounded-[2rem] p-6 shadow-lg shadow-amber-200/20 hover:-translate-y-1 transition-transform flex-grow flex flex-col justify-center relative overflow-hidden">
+            <div class="absolute right-0 top-0 w-24 h-24 bg-amber-200/50 rounded-full blur-2xl -mr-10 -mt-10"></div>
+            <div class="flex justify-between items-center mb-3 relative z-10">
+                <div class="w-10 h-10 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                </div>
+                <h3 class="text-3xl font-black text-amber-600">0</h3>
+            </div>
+            <span class="text-sm font-bold text-slate-800 relative z-10">Leave Requests</span>
+        </div>
+        <div class="bg-blue-50/80 backdrop-blur-md border border-blue-100 rounded-[2rem] p-6 shadow-lg shadow-blue-200/20 hover:-translate-y-1 transition-transform flex-grow flex flex-col justify-center relative overflow-hidden">
+            <div class="absolute right-0 top-0 w-24 h-24 bg-blue-200/50 rounded-full blur-2xl -mr-10 -mt-10"></div>
+            <div class="flex justify-between items-center mb-3 relative z-10">
+                <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                </div>
+                <h3 class="text-3xl font-black text-blue-600">0</h3>
+            </div>
+            <span class="text-sm font-bold text-slate-800 relative z-10">New Messages</span>
         </div>
     </div>
 </div>
 
-<script>
-let attendanceTimer;
-
-function triggerConfetti() {
-    const duration = 3 * 1000;
-    const animationEnd = Date.now() + duration;
-    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999 };
-
-    const randomInRange = (min, max) => Math.random() * (max - min) + min;
-
-    const interval = setInterval(function() {
-        const timeLeft = animationEnd - Date.now();
-
-        if (timeLeft <= 0) {
-            return clearInterval(interval);
-        }
-
-        const particleCount = 50 * (timeLeft / duration);
-        confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
-        confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
-    }, 250);
-}
-
-
-function startAttendanceTimer(durationS) {
-    const display = document.getElementById('otp-timer');
-    const progress = document.getElementById('otp-progress');
-    const resendBtn = document.getElementById('resend-btn');
-    let timer = durationS;
-    
-    clearInterval(attendanceTimer);
-    display.classList.remove('text-rose-500');
-    if(resendBtn) resendBtn.classList.add('hidden');
-    
-    attendanceTimer = setInterval(() => {
-        const seconds = parseInt(timer % 60, 10);
-        display.textContent = seconds + 's';
-        
-        const percent = (timer / durationS) * 100;
-        progress.style.width = percent + '%';
-
-        if (--timer < 0) {
-            clearInterval(attendanceTimer);
-            display.textContent = "Expired";
-            display.classList.add('text-rose-500');
-            progress.style.width = '0%';
-            if(resendBtn) resendBtn.classList.remove('hidden');
-        }
-    }, 1000);
-}
-
-// UI Helper for Toasts
-function showToast(title, message, type = 'success') {
-    const container = document.getElementById('floating-toasts');
-    if (!container) {
-        alert(title + ": " + message);
-        return;
-    }
-    
-    const toast = document.createElement('div');
-    toast.className = `toast-item pointer-events-auto relative glass-panel p-4 rounded-xl text-slate-800 flex items-start gap-3 shadow-2xl border-l-4 ${type === 'error' ? 'border-rose-500' : 'border-indigo-500'} overflow-hidden cursor-pointer`;
-    toast.style.animation = "slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards";
-    
-    toast.innerHTML = `
-        <div class="flex-grow pt-0.5 font-medium text-sm">
-            <strong class="block text-xs uppercase opacity-70">${title}</strong>
-            ${message}
-        </div>
-        <button class="toast-close flex-shrink-0 text-slate-400 hover:text-slate-600 transition-colors p-1" onclick="this.parentElement.remove()">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-        </button>
-    `;
-    
-    toast.addEventListener('click', () => {
-        toast.style.opacity = '0';
-        setTimeout(() => toast.remove(), 300);
-    });
-
-    container.appendChild(toast);
-    setTimeout(() => {
-        if(toast.parentElement) toast.remove();
-    }, 5000);
-}
-
-function getDeviceID() {
-    let deviceId = localStorage.getItem('schoolos_device_id');
-    if (!deviceId) {
-        deviceId = crypto.randomUUID ? crypto.randomUUID() : 'dev-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now();
-        localStorage.setItem('schoolos_device_id', deviceId);
-    }
-    return deviceId;
-}
-
-function getCSRFToken() {
-    return document.cookie.split('; ')
-        .find(row => row.startsWith('csrftoken='))
-        ?.split('=')[1] || '';
-}
-
-function initiateAttendance(isResend = false) {
-    const btn = document.querySelector('#attendance-default-state button');
-    const resendBtn = document.getElementById('resend-btn');
-    const originalText = btn.innerText;
-    
-    if (!isResend) {
-        btn.disabled = true;
-        btn.innerText = "Checking Network...";
-    } else {
-        resendBtn.disabled = true;
-        resendBtn.innerText = "Sending...";
-    }
-
-    fetch("{% url 'attendance:teacher_attendance_initiate' %}", {
-        method: "POST",
-        headers: { "X-CSRFToken": getCSRFToken() }
-    })
-    .then(async res => {
-        const data = await res.json();
-        if (res.ok && data.success) {
-            document.getElementById('attendance-default-state').classList.add('hidden');
-            document.getElementById('attendance-otp-state').classList.remove('hidden');
-            document.getElementById('otp-display').innerText = data.otp;
-            
-            startAttendanceTimer(60);
-            showToast("OTP Generated", "Please enter the code shown on the screen.");
-        } else {
-            throw new Error(data.error || "Establishment failed.");
-        }
-    })
-    .catch(err => {
-        showToast("Access Denied", err.message, "error");
-        if (!isResend) {
-            btn.disabled = false;
-            btn.innerText = originalText;
-        } else {
-            resendBtn.disabled = false;
-            resendBtn.innerText = "Didn't get code? Resend";
-        }
-    });
-}
-
-function verifyAttendance() {
-    const otp = document.getElementById('attendance-otp-input').value;
-    const deviceId = getDeviceID();
-    const btn = document.querySelector('#attendance-otp-state button');
-    
-    if (otp.length !== 6) {
-        showToast("Invalid Input", "Please enter a 6-digit OTP.", "error");
-        return;
-    }
-
-    btn.disabled = true;
-    btn.innerText = "Verifying...";
-
-    const formData = new URLSearchParams();
-    formData.append('otp', otp);
-    formData.append('device_id', deviceId);
-
-    fetch("{% url 'attendance:teacher_attendance_verify' %}", {
-        method: "POST",
-        headers: {
-            "X-CSRFToken": getCSRFToken(),
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: formData
-    })
-    .then(async res => {
-        const data = await res.json();
-        if (res.ok && data.success) {
-            document.getElementById('attendance-otp-state').classList.add('hidden');
-            document.getElementById('attendance-success-state').classList.remove('hidden');
-            showToast("Verified", "Attendance marked successfully.");
-            triggerConfetti();
-        } else {
-            throw new Error(data.error || "Verification failed.");
-        }
-    })
-    .catch(err => {
-        showToast("Error", err.message, "error");
-        btn.disabled = false;
-        btn.innerText = "Verify & Submit";
-    });
-}
-
-function requestExtension(sectionId) {
-    if(confirm("Are you sure you want to request an attendance extension from the admin?")) {
-        fetch("{% url 'timetable:request_extension' %}", {
-            method: "POST",
-            headers: {
-                "X-CSRFToken": getCSRFToken(),
-                "Content-Type": "application/x-www-form-urlencoded"
-            },
-            body: new URLSearchParams({
-                'section_id': sectionId,
-                'duration': 15
-            })
-        })
-        .then(res => res.json())
-        .then(data => {
-            if(data.success) {
-                showToast("Request Sent", data.message);
-                location.reload();
-            } else {
-                showToast("Error", data.error, "error");
-            }
-        });
-    }
-}
-</script>
-
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-10">
     <!-- Active Assignments -->
-    <div class="glass-panel p-6 rounded-3xl border border-white/60 shadow-xl">
-        <div class="flex items-center justify-between mb-6">
-            <h3 class="text-xl font-bold text-slate-800">My Assignments</h3>
-            <span class="px-3 py-1 bg-indigo-100 text-indigo-600 rounded-lg text-xs font-bold uppercase">Current</span>
+    <div class="lg:col-span-8 bg-white/70 backdrop-blur-xl border border-white rounded-[2rem] p-8 shadow-xl">
+        <div class="flex items-center justify-between mb-8">
+            <h3 class="text-xl font-extrabold text-slate-800">My Assignments</h3>
+            <span class="px-3 py-1 bg-indigo-100 text-indigo-600 rounded-lg text-xs font-bold uppercase tracking-wider">Current Schedule</span>
         </div>
         <div class="space-y-4">
             {% for assignment in assignments %}
-            <div class="flex items-center justify-between p-4 bg-white/40 rounded-2xl border border-white/60 hover:bg-white/60 transition group">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-white/40 rounded-2xl border border-white/80 hover:bg-white/80 hover:shadow-md transition-all group gap-4">
                 <div class="flex items-center gap-4">
-                    <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 text-white flex items-center justify-center font-black text-xl shadow-md">
                         {{ assignment.subject.name|first|upper }}
                     </div>
                     <div>
-                        <div class="font-bold text-slate-800">{{ assignment.subject.name }}</div>
-                        <div class="text-xs text-slate-400 font-semibold">{{ assignment.class_level.name }} - Section {{ assignment.section.name }}</div>
+                        <div class="font-black text-slate-800 text-lg group-hover:text-indigo-600 transition">{{ assignment.subject.name }}</div>
+                        <div class="text-xs text-slate-500 font-bold uppercase tracking-wider mt-0.5">{{ assignment.class_level.name }} &bull; Section {{ assignment.section.name }}</div>
                     </div>
                 </div>
-                <div class="flex gap-2">
+                <div class="flex gap-2 w-full sm:w-auto">
                     {% if is_working_day %}
                         {% if attendance_section.pk == assignment.section.pk %}
                             {% if can_mark_students %}
-                            <a href="{% url 'attendance:mark_students' %}?class={{ assignment.class_level.pk }}&section={{ assignment.section.pk }}" class="flex items-center gap-2 px-4 py-2 bg-emerald-100 text-emerald-700 rounded-xl text-xs font-bold hover:bg-emerald-200 transition" title="Mark Attendance">
+                            <a href="{% url 'attendance:mark_students' %}?class={{ assignment.class_level.pk }}&section={{ assignment.section.pk }}" class="flex-grow sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-400 to-teal-500 text-white rounded-xl text-sm font-bold hover:shadow-lg hover:-translate-y-0.5 transition" title="Mark Attendance">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
-                                Mark Attendance
+                                Attendance
                             </a>
                             {% elif needs_extension %}
-                            <button onclick="requestExtension('{{ assignment.section.pk }}')" class="flex items-center gap-2 px-4 py-2 bg-rose-100 text-rose-700 rounded-xl text-xs font-bold hover:bg-rose-200 transition">
+                            <button onclick="requestExtension('{{ assignment.section.pk }}')" class="flex-grow sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-rose-400 to-pink-500 text-white rounded-xl text-sm font-bold hover:shadow-lg hover:-translate-y-0.5 transition">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                 Request Extension
                             </button>
@@ -307,52 +155,55 @@ function requestExtension(sectionId) {
                         {% endif %}
                     {% endif %}
                     
-                    <a href="{% url 'grading:mark_add' %}" class="p-2 hover:bg-purple-50 text-purple-600 rounded-lg transition" title="Enter Marks">
+                    <a href="{% url 'grading:mark_add' %}" class="flex items-center justify-center p-2.5 bg-purple-50 text-purple-600 rounded-xl hover:bg-purple-600 hover:text-white transition shadow-sm" title="Enter Marks">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 012.828 0L20 7.586a2 2 0 010 2.828l-9.828 9.828l-4 1l1-4L16.586 3.414z"></path></svg>
                     </a>
                 </div>
             </div>
             {% empty %}
-            <div class="text-center py-10">
-                <div class="text-slate-400 mb-2 font-medium">No assignments found</div>
-                <p class="text-sm text-slate-400 italic">Please contact your administrator for class assignments.</p>
+            <div class="text-center py-12 bg-slate-50/50 rounded-2xl border-2 border-dashed border-slate-200">
+                <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.082.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.082.477-4.5 1.253"></path></svg>
+                </div>
+                <div class="text-slate-500 font-bold text-lg">No Active Assignments</div>
+                <p class="text-sm text-slate-400 mt-1">Please contact administration for class scheduling.</p>
             </div>
             {% endfor %}
         </div>
     </div>
 
-    <!-- Quick Actions & Schedule Placeholder -->
-    <div class="space-y-6">
-        <div class="glass-panel p-6 rounded-3xl border border-white/60 shadow-xl bg-gradient-to-tr from-indigo-50/30 to-transparent">
-            <h3 class="text-xl font-bold text-slate-800 mb-6">Staff Quick Access</h3>
-            <div class="grid grid-cols-2 gap-4">
-                <a href="{% url 'attendance:leave_request_add' %}" class="flex flex-col items-center justify-center p-6 bg-white/40 rounded-2xl border border-white/60 hover:bg-white/80 transition group shadow-sm text-center" style="text-decoration:none;">
-                    <div class="w-10 h-10 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center mb-3 group-hover:scale-110 transition">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                    </div>
-                    <span class="text-sm font-bold text-slate-700">Request Leave</span>
-                </a>
-                
-                <a href="#" class="flex flex-col items-center justify-center p-6 bg-white/40 rounded-2xl border border-white/60 hover:bg-white/80 transition group shadow-sm text-center" style="text-decoration:none;">
-                    <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center mb-3 group-hover:scale-110 transition">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                    </div>
-                    <span class="text-sm font-bold text-slate-700">Messages</span>
-                </a>
-            </div>
-        </div>
-        
-        <div class="glass-panel p-6 rounded-3xl border border-white/60 shadow-xl">
-             <h3 class="text-xl font-bold text-slate-800 mb-6 font-display">Resources</h3>
-             <div class="space-y-4">
-                 <div class="flex items-center gap-3 text-slate-500 hover:text-indigo-600 transition cursor-pointer">
-                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.082.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.082.477-4.5 1.253"></path></svg>
-                     <span class="text-sm font-semibold">Teacher's Guide Book</span>
-                 </div>
-                 <div class="flex items-center gap-3 text-slate-500 hover:text-indigo-600 transition cursor-pointer">
-                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                     <span class="text-sm font-semibold">School Curriculum PDF</span>
-                 </div>
+    <!-- Quick Actions & Resources Column -->
+    <div class="lg:col-span-4 flex flex-col gap-8">
+        <div class="bg-white/70 backdrop-blur-xl border border-white rounded-[2rem] p-8 shadow-xl flex-grow">
+             <h3 class="text-xl font-extrabold text-slate-800 mb-6">Staff Resources</h3>
+             <div class="space-y-3">
+                 <a href="#" class="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl hover:bg-indigo-50 group transition" style="text-decoration:none;">
+                     <div class="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center text-slate-400 group-hover:text-indigo-600 transition">
+                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.082.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.082.477-4.5 1.253"></path></svg>
+                     </div>
+                     <div>
+                         <span class="text-sm font-bold text-slate-800 group-hover:text-indigo-600 block">Teacher's Guide Book</span>
+                         <span class="text-xs font-semibold text-slate-400">PDF Document &bull; 2.4 MB</span>
+                     </div>
+                 </a>
+                 <a href="#" class="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl hover:bg-emerald-50 group transition" style="text-decoration:none;">
+                     <div class="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center text-slate-400 group-hover:text-emerald-600 transition">
+                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                     </div>
+                     <div>
+                         <span class="text-sm font-bold text-slate-800 group-hover:text-emerald-600 block">School Curriculum</span>
+                         <span class="text-xs font-semibold text-slate-400">PDF Document &bull; 5.1 MB</span>
+                     </div>
+                 </a>
+                 <a href="{% url 'attendance:leave_request_add' %}" class="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl hover:bg-rose-50 group transition" style="text-decoration:none;">
+                     <div class="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center text-slate-400 group-hover:text-rose-600 transition">
+                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                     </div>
+                     <div>
+                         <span class="text-sm font-bold text-slate-800 group-hover:text-rose-600 block">Request Leave</span>
+                         <span class="text-xs font-semibold text-slate-400">Submit Application</span>
+                     </div>
+                 </a>
              </div>
         </div>
     </div>
