@@ -18,18 +18,28 @@
 
     <!-- External Custom CSS -->
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/common.css' %}">
+    {% block extra_css %}{% endblock %}
+
+    <style>
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+
 </head>
 
 <body class="antialiased font-sans text-slate-800">
 
-    <!-- Animated Blurred Background Blobs -->
-    <div class="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-[-1]">
-        <div
-            class="absolute -top-20 -left-20 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob">
-        </div>
-        <div
-            class="absolute top-40 right-20 w-96 h-96 bg-indigo-300 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-2000">
-        </div>
+    <!-- Animated Vibrant Background Effects -->
+    <div class="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-[-1] bg-slate-100">
+        <div class="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-gradient-to-br from-pink-300/40 to-purple-400/40 rounded-full mix-blend-multiply filter blur-[100px] animate-blob"></div>
+        <div class="absolute top-[20%] -right-[10%] w-[40%] h-[50%] bg-gradient-to-bl from-indigo-300/40 to-blue-400/40 rounded-full mix-blend-multiply filter blur-[100px] animate-blob animation-delay-2000"></div>
+        <div class="absolute -bottom-[20%] left-[20%] w-[60%] h-[40%] bg-gradient-to-tr from-emerald-200/40 to-teal-300/40 rounded-full mix-blend-multiply filter blur-[100px] animate-blob animation-delay-4000"></div>
     </div>
 
     {% if user.is_authenticated %}
@@ -37,11 +47,12 @@
     <div id="sidebar-overlay" class="sidebar-overlay lg:hidden"></div>
 
     <!-- SIDEBAR (Only visible to authenticated users) -->
-    <aside id="app-sidebar" class="sidebar glass-panel rounded-3xl p-6 flex flex-col animate-slide-up"
+    <aside id="app-sidebar" class="sidebar bg-slate-900 border-r border-slate-800 text-slate-300 shadow-2xl rounded-tr-3xl rounded-br-3xl lg:rounded-3xl flex flex-col animate-slide-up h-full lg:h-[calc(100vh-2rem)] fixed left-0 top-0 lg:top-4 z-[60] w-[280px] transition-transform duration-300 hide-scrollbar"
         style="animation-duration: 0.5s;">
-        <div class="flex-grow">
+        <div class="flex-grow flex flex-col h-full">
+            <div class="sticky top-0 z-20 bg-slate-900 px-6 pt-6 pb-6 mb-4 border-b border-slate-800">
             <a href="{% url 'accounts:dashboard' %}"
-                class="flex items-center gap-3 mb-10 hover:opacity-80 transition cursor-pointer"
+                class="flex items-center gap-3 hover:opacity-80 transition cursor-pointer"
                 style="text-decoration:none;">
                 <div
                     class="h-12 w-12 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white shadow-lg">
@@ -54,11 +65,13 @@
                         </path>
                     </svg>
                 </div>
-                <div class="text-2xl font-bold tracking-tight text-slate-800">SchoolOS</div>
+                <div class="text-2xl font-bold tracking-tight text-white">SchoolOS</div>
             </a>
+            </div>
 
+            <div class="px-6 pb-4">
             <nav class="space-y-1 pb-4">
-                <a href="{% url 'accounts:dashboard' %}" class="nav-link" style="text-decoration:none;">
+                <a href="{% url 'accounts:dashboard' %}" class="nav-link {% if request.resolver_match.app_name == 'accounts' and request.resolver_match.url_name == 'dashboard' %}bg-indigo-500/20 text-indigo-300 font-bold{% else %}text-slate-300{% endif %}" style="text-decoration:none;">
                     <svg class="w-5 h-5 mr-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
@@ -67,7 +80,7 @@
                     Dashboard
                 </a>
 
-                <a href="{% url 'notifications:inbox' %}" class="nav-link relative" style="text-decoration:none;">
+                <a href="{% url 'notifications:inbox' %}" class="nav-link relative {% if request.resolver_match.app_name == 'notifications' and request.resolver_match.url_name == 'inbox' %}bg-indigo-500/20 text-indigo-300 font-bold{% else %}text-slate-300{% endif %}" style="text-decoration:none;">
                     <svg class="w-5 h-5 mr-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
@@ -82,20 +95,20 @@
 
                 {% if user.role == 'ADMIN' %}
                 <!-- Directory Dropdown -->
-                <div class="sidebar-dropdown pt-4">
+                <div class="sidebar-dropdown pt-4 {% if request.resolver_match.app_name == 'people' or request.resolver_match.app_name == 'accounts' and request.resolver_match.url_name != 'dashboard' and request.resolver_match.url_name != 'password_change' %}active{% endif %}">
                     <button type="button"
-                        class="sidebar-dropdown-toggle w-full flex items-center justify-between px-4 py-2 text-slate-500 hover:text-indigo-600 transition-colors focus:outline-none">
+                        class="sidebar-dropdown-toggle w-full flex items-center justify-between px-4 py-2 text-slate-400 hover:text-indigo-400 transition-colors focus:outline-none {% if request.resolver_match.app_name == 'people' %}text-indigo-400{% endif %}">
                         <span class="text-xs font-bold uppercase tracking-widest">Directory</span>
-                        <svg class="w-4 h-4 transition-transform duration-200 transform caret-icon" fill="none"
+                        <svg class="w-4 h-4 transition-transform duration-200 transform caret-icon {% if request.resolver_match.app_name == 'people' %}rotate-180{% endif %}" fill="none"
                             stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
                             </path>
                         </svg>
                     </button>
                     <div
-                        class="sidebar-dropdown-menu space-y-1 mt-1 hidden max-h-0 overflow-hidden transition-all duration-300">
+                        class="sidebar-dropdown-menu space-y-1 mt-1 overflow-hidden transition-all duration-300 {% if request.resolver_match.app_name == 'people' or request.resolver_match.app_name == 'accounts' and request.resolver_match.url_name != 'dashboard' and request.resolver_match.url_name != 'password_change' %}max-h-[500px]{% else %}max-h-0 hidden{% endif %} border-l-2 border-indigo-500/30 ml-4">
                         <a href="{% url 'people:teacher_list' %}"
-                            class="nav-link pl-8 text-sm py-2 shadow-none hover:bg-slate-50/50"
+                            class="nav-link pl-8 text-sm py-2 shadow-none hover:bg-white/5 {% if request.resolver_match.app_name == 'people' and request.resolver_match.url_name == 'teacher_list' %}bg-indigo-500/20 text-indigo-300 font-bold{% else %}text-slate-300{% endif %}"
                             style="text-decoration:none;">
                             <svg class="w-4 h-4 mr-3 flex-shrink-0" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
@@ -106,7 +119,7 @@
                             Teachers
                         </a>
                         <a href="{% url 'people:student_list' %}"
-                            class="nav-link pl-8 text-sm py-2 shadow-none hover:bg-slate-50/50"
+                            class="nav-link pl-8 text-sm py-2 shadow-none hover:bg-white/5 {% if request.resolver_match.app_name == 'people' and request.resolver_match.url_name == 'student_list' %}bg-indigo-500/20 text-indigo-300 font-bold{% else %}text-slate-300{% endif %}"
                             style="text-decoration:none;">
                             <svg class="w-4 h-4 mr-3 flex-shrink-0" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
@@ -117,7 +130,7 @@
                             Students
                         </a>
                         <a href="{% url 'people:parent_list' %}"
-                            class="nav-link pl-8 text-sm py-2 shadow-none hover:bg-slate-50/50"
+                            class="nav-link pl-8 text-sm py-2 shadow-none hover:bg-white/5 {% if request.resolver_match.app_name == 'people' and request.resolver_match.url_name == 'parent_list' %}bg-indigo-500/20 text-indigo-300 font-bold{% else %}text-slate-300{% endif %}"
                             style="text-decoration:none;">
                             <svg class="w-4 h-4 mr-3 flex-shrink-0" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
@@ -128,7 +141,7 @@
                             Parents
                         </a>
                         <a href="{% url 'accounts:user_list' %}"
-                            class="nav-link pl-8 text-sm py-2 shadow-none hover:bg-slate-50/50"
+                            class="nav-link pl-8 text-sm py-2 shadow-none hover:bg-white/5 {% if request.resolver_match.app_name == 'accounts' and request.resolver_match.url_name == 'user_list' %}bg-indigo-500/20 text-indigo-300 font-bold{% else %}text-slate-300{% endif %}"
                             style="text-decoration:none;">
                             <svg class="w-4 h-4 mr-3 flex-shrink-0" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
@@ -142,20 +155,20 @@
                 </div>
 
                 <!-- Academics Dropdown -->
-                <div class="sidebar-dropdown pt-2">
+                <div class="sidebar-dropdown pt-2 {% if request.resolver_match.app_name == 'academics' %}active{% endif %}">
                     <button type="button"
-                        class="sidebar-dropdown-toggle w-full flex items-center justify-between px-4 py-2 text-slate-500 hover:text-indigo-600 transition-colors focus:outline-none">
+                        class="sidebar-dropdown-toggle w-full flex items-center justify-between px-4 py-2 text-slate-400 hover:text-indigo-400 transition-colors focus:outline-none {% if request.resolver_match.app_name == 'academics' %}text-indigo-400{% endif %}">
                         <span class="text-xs font-bold uppercase tracking-widest">Academics</span>
-                        <svg class="w-4 h-4 transition-transform duration-200 transform caret-icon" fill="none"
+                        <svg class="w-4 h-4 transition-transform duration-200 transform caret-icon {% if request.resolver_match.app_name == 'academics' %}rotate-180{% endif %}" fill="none"
                             stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
                             </path>
                         </svg>
                     </button>
                     <div
-                        class="sidebar-dropdown-menu space-y-1 mt-1 hidden max-h-0 overflow-hidden transition-all duration-300">
+                        class="sidebar-dropdown-menu space-y-1 mt-1 overflow-hidden transition-all duration-300 {% if request.resolver_match.app_name == 'academics' %}max-h-[500px]{% else %}max-h-0 hidden{% endif %} border-l-2 border-indigo-500/30 ml-4">
                         <a href="{% url 'academics:session_list' %}"
-                            class="nav-link pl-8 text-sm py-2 shadow-none hover:bg-slate-50/50"
+                            class="nav-link pl-8 text-sm py-2 shadow-none hover:bg-white/5 {% if request.resolver_match.app_name == 'academics' and request.resolver_match.url_name == 'session_list' %}bg-indigo-500/20 text-indigo-300 font-bold{% else %}text-slate-300{% endif %}"
                             style="text-decoration:none;">
                             <svg class="w-4 h-4 mr-3 flex-shrink-0" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
@@ -166,7 +179,7 @@
                             Sessions
                         </a>
                         <a href="{% url 'academics:class_list' %}"
-                            class="nav-link pl-8 text-sm py-2 shadow-none hover:bg-slate-50/50"
+                            class="nav-link pl-8 text-sm py-2 shadow-none hover:bg-white/5 {% if request.resolver_match.app_name == 'academics' and request.resolver_match.url_name == 'class_list' %}bg-indigo-500/20 text-indigo-300 font-bold{% else %}text-slate-300{% endif %}"
                             style="text-decoration:none;">
                             <svg class="w-4 h-4 mr-3 flex-shrink-0" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
@@ -177,7 +190,7 @@
                             Classes
                         </a>
                         <a href="{% url 'academics:section_list' %}"
-                            class="nav-link pl-8 text-sm py-2 shadow-none hover:bg-slate-50/50"
+                            class="nav-link pl-8 text-sm py-2 shadow-none hover:bg-white/5 {% if request.resolver_match.app_name == 'academics' and request.resolver_match.url_name == 'section_list' %}bg-indigo-500/20 text-indigo-300 font-bold{% else %}text-slate-300{% endif %}"
                             style="text-decoration:none;">
                             <svg class="w-4 h-4 mr-3 flex-shrink-0" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
@@ -188,7 +201,7 @@
                             Sections
                         </a>
                         <a href="{% url 'academics:subject_list' %}"
-                            class="nav-link pl-8 text-sm py-2 shadow-none hover:bg-slate-50/50"
+                            class="nav-link pl-8 text-sm py-2 shadow-none hover:bg-white/5 {% if request.resolver_match.app_name == 'academics' and request.resolver_match.url_name == 'subject_list' %}bg-indigo-500/20 text-indigo-300 font-bold{% else %}text-slate-300{% endif %}"
                             style="text-decoration:none;">
                             <svg class="w-4 h-4 mr-3 flex-shrink-0" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
@@ -199,7 +212,7 @@
                             Subjects
                         </a>
                         <a href="{% url 'academics:assignment_list' %}"
-                            class="nav-link pl-8 text-sm py-2 shadow-none hover:bg-slate-50/50"
+                            class="nav-link pl-8 text-sm py-2 shadow-none hover:bg-white/5 {% if request.resolver_match.app_name == 'academics' and request.resolver_match.url_name == 'assignment_list' %}bg-indigo-500/20 text-indigo-300 font-bold{% else %}text-slate-300{% endif %}"
                             style="text-decoration:none;">
                             <svg class="w-4 h-4 mr-3 flex-shrink-0" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
@@ -212,20 +225,20 @@
                 </div>
 
                 <!-- Timetable Dropdown -->
-                <div class="sidebar-dropdown pt-2">
+                <div class="sidebar-dropdown pt-2 {% if request.resolver_match.app_name == 'timetable' %}active{% endif %}">
                     <button type="button"
-                        class="sidebar-dropdown-toggle w-full flex items-center justify-between px-4 py-2 text-slate-500 hover:text-indigo-600 transition-colors focus:outline-none">
+                        class="sidebar-dropdown-toggle w-full flex items-center justify-between px-4 py-2 text-slate-400 hover:text-indigo-400 transition-colors focus:outline-none {% if request.resolver_match.app_name == 'timetable' %}text-indigo-400{% endif %}">
                         <span class="text-xs font-bold uppercase tracking-widest">Schedule</span>
-                        <svg class="w-4 h-4 transition-transform duration-200 transform caret-icon" fill="none"
+                        <svg class="w-4 h-4 transition-transform duration-200 transform caret-icon {% if request.resolver_match.app_name == 'timetable' %}rotate-180{% endif %}" fill="none"
                             stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
                             </path>
                         </svg>
                     </button>
                     <div
-                        class="sidebar-dropdown-menu space-y-1 mt-1 hidden max-h-0 overflow-hidden transition-all duration-300">
+                        class="sidebar-dropdown-menu space-y-1 mt-1 overflow-hidden transition-all duration-300 {% if request.resolver_match.app_name == 'timetable' %}max-h-[500px]{% else %}max-h-0 hidden{% endif %} border-l-2 border-indigo-500/30 ml-4">
                         <a href="{% url 'timetable:builder' %}"
-                            class="nav-link pl-8 text-sm py-2 shadow-none hover:bg-slate-50/50"
+                            class="nav-link pl-8 text-sm py-2 shadow-none hover:bg-white/5 {% if request.resolver_match.app_name == 'timetable' and request.resolver_match.url_name == 'builder' %}bg-indigo-500/20 text-indigo-300 font-bold{% else %}text-slate-300{% endif %}"
                             style="text-decoration:none;">
                             <svg class="w-4 h-4 mr-3 flex-shrink-0" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
@@ -236,7 +249,7 @@
                             Builder
                         </a>
                         <a href="{% url 'timetable:preset_list' %}"
-                            class="nav-link pl-8 text-sm py-2 shadow-none hover:bg-slate-50/50"
+                            class="nav-link pl-8 text-sm py-2 shadow-none hover:bg-white/5 {% if request.resolver_match.app_name == 'timetable' and request.resolver_match.url_name == 'preset_list' %}bg-indigo-500/20 text-indigo-300 font-bold{% else %}text-slate-300{% endif %}"
                             style="text-decoration:none;">
                             <svg class="w-4 h-4 mr-3 flex-shrink-0" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
@@ -246,7 +259,7 @@
                             Presets
                         </a>
                         <a href="{% url 'timetable:extension_list' %}"
-                            class="nav-link pl-8 text-sm py-2 shadow-none hover:bg-slate-50/50"
+                            class="nav-link pl-8 text-sm py-2 shadow-none hover:bg-white/5 {% if request.resolver_match.app_name == 'timetable' and request.resolver_match.url_name == 'extension_list' %}bg-indigo-500/20 text-indigo-300 font-bold{% else %}text-slate-300{% endif %}"
                             style="text-decoration:none;">
                             <svg class="w-4 h-4 mr-3 flex-shrink-0" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
@@ -260,20 +273,20 @@
                 </div>
 
                 <!-- Attendance Dropdown -->
-                <div class="sidebar-dropdown pt-2">
+                <div class="sidebar-dropdown pt-2 {% if request.resolver_match.app_name == 'attendance' %}active{% endif %}">
                     <button type="button"
-                        class="sidebar-dropdown-toggle w-full flex items-center justify-between px-4 py-2 text-slate-500 hover:text-indigo-600 transition-colors focus:outline-none">
+                        class="sidebar-dropdown-toggle w-full flex items-center justify-between px-4 py-2 text-slate-400 hover:text-indigo-400 transition-colors focus:outline-none {% if request.resolver_match.app_name == 'attendance' %}text-indigo-400{% endif %}">
                         <span class="text-xs font-bold uppercase tracking-widest">Attendance</span>
-                        <svg class="w-4 h-4 transition-transform duration-200 transform caret-icon" fill="none"
+                        <svg class="w-4 h-4 transition-transform duration-200 transform caret-icon {% if request.resolver_match.app_name == 'attendance' %}rotate-180{% endif %}" fill="none"
                             stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
                             </path>
                         </svg>
                     </button>
                     <div
-                        class="sidebar-dropdown-menu space-y-1 mt-1 hidden max-h-0 overflow-hidden transition-all duration-300">
+                        class="sidebar-dropdown-menu space-y-1 mt-1 overflow-hidden transition-all duration-300 {% if request.resolver_match.app_name == 'attendance' %}max-h-[500px]{% else %}max-h-0 hidden{% endif %} border-l-2 border-indigo-500/30 ml-4">
                         <a href="{% url 'attendance:teacher_attendance_list' %}"
-                            class="nav-link pl-8 text-sm py-2 shadow-none hover:bg-slate-50/50"
+                            class="nav-link pl-8 text-sm py-2 shadow-none hover:bg-white/5 {% if request.resolver_match.app_name == 'attendance' and request.resolver_match.url_name == 'teacher_attendance_list' %}bg-indigo-500/20 text-indigo-300 font-bold{% else %}text-slate-300{% endif %}"
                             style="text-decoration:none;">
                             <svg class="w-4 h-4 mr-3 flex-shrink-0" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
@@ -284,7 +297,7 @@
                             Teachers
                         </a>
                         <a href="{% url 'attendance:student_attendance_list' %}"
-                            class="nav-link pl-8 text-sm py-2 shadow-none hover:bg-slate-50/50"
+                            class="nav-link pl-8 text-sm py-2 shadow-none hover:bg-white/5 {% if request.resolver_match.app_name == 'attendance' and request.resolver_match.url_name == 'student_attendance_list' %}bg-indigo-500/20 text-indigo-300 font-bold{% else %}text-slate-300{% endif %}"
                             style="text-decoration:none;">
                             <svg class="w-4 h-4 mr-3 flex-shrink-0" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
@@ -295,7 +308,7 @@
                             Students
                         </a>
                         <a href="{% url 'attendance:leave_request_list' %}"
-                            class="nav-link pl-8 text-sm py-2 shadow-none hover:bg-slate-50/50"
+                            class="nav-link pl-8 text-sm py-2 shadow-none hover:bg-white/5 {% if request.resolver_match.app_name == 'attendance' and request.resolver_match.url_name == 'leave_request_list' %}bg-indigo-500/20 text-indigo-300 font-bold{% else %}text-slate-300{% endif %}"
                             style="text-decoration:none;">
                             <svg class="w-4 h-4 mr-3 flex-shrink-0" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
@@ -309,20 +322,20 @@
                 </div>
 
                 <!-- Fees Dropdown -->
-                <div class="sidebar-dropdown pt-2">
+                <div class="sidebar-dropdown pt-2 {% if request.resolver_match.app_name == 'fees' %}active{% endif %}">
                     <button type="button"
-                        class="sidebar-dropdown-toggle w-full flex items-center justify-between px-4 py-2 text-slate-500 hover:text-indigo-600 transition-colors focus:outline-none">
+                        class="sidebar-dropdown-toggle w-full flex items-center justify-between px-4 py-2 text-slate-400 hover:text-indigo-400 transition-colors focus:outline-none {% if request.resolver_match.app_name == 'fees' %}text-indigo-400{% endif %}">
                         <span class="text-xs font-bold uppercase tracking-widest">Fees</span>
-                        <svg class="w-4 h-4 transition-transform duration-200 transform caret-icon" fill="none"
+                        <svg class="w-4 h-4 transition-transform duration-200 transform caret-icon {% if request.resolver_match.app_name == 'fees' %}rotate-180{% endif %}" fill="none"
                             stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
                             </path>
                         </svg>
                     </button>
                     <div
-                        class="sidebar-dropdown-menu space-y-1 mt-1 hidden max-h-0 overflow-hidden transition-all duration-300">
+                        class="sidebar-dropdown-menu space-y-1 mt-1 overflow-hidden transition-all duration-300 {% if request.resolver_match.app_name == 'fees' %}max-h-[500px]{% else %}max-h-0 hidden{% endif %} border-l-2 border-indigo-500/30 ml-4">
                         <a href="{% url 'fees:fee_structure_list' %}"
-                            class="nav-link pl-8 text-sm py-2 shadow-none hover:bg-slate-50/50"
+                            class="nav-link pl-8 text-sm py-2 shadow-none hover:bg-white/5 {% if request.resolver_match.app_name == 'fees' and request.resolver_match.url_name == 'fee_structure_list' %}bg-indigo-500/20 text-indigo-300 font-bold{% else %}text-slate-300{% endif %}"
                             style="text-decoration:none;">
                             <svg class="w-4 h-4 mr-3 flex-shrink-0" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
@@ -333,7 +346,7 @@
                             Structures
                         </a>
                         <a href="{% url 'fees:payment_list' %}"
-                            class="nav-link pl-8 text-sm py-2 shadow-none hover:bg-slate-50/50"
+                            class="nav-link pl-8 text-sm py-2 shadow-none hover:bg-white/5 {% if request.resolver_match.app_name == 'fees' and request.resolver_match.url_name == 'payment_list' %}bg-indigo-500/20 text-indigo-300 font-bold{% else %}text-slate-300{% endif %}"
                             style="text-decoration:none;">
                             <svg class="w-4 h-4 mr-3 flex-shrink-0" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
@@ -347,20 +360,20 @@
                 </div>
 
                 <!-- Grading Dropdown -->
-                <div class="sidebar-dropdown pt-2">
+                <div class="sidebar-dropdown pt-2 {% if request.resolver_match.app_name == 'grading' %}active{% endif %}">
                     <button type="button"
-                        class="sidebar-dropdown-toggle w-full flex items-center justify-between px-4 py-2 text-slate-500 hover:text-indigo-600 transition-colors focus:outline-none">
+                        class="sidebar-dropdown-toggle w-full flex items-center justify-between px-4 py-2 text-slate-400 hover:text-indigo-400 transition-colors focus:outline-none {% if request.resolver_match.app_name == 'grading' %}text-indigo-400{% endif %}">
                         <span class="text-xs font-bold uppercase tracking-widest">Grading</span>
-                        <svg class="w-4 h-4 transition-transform duration-200 transform caret-icon" fill="none"
+                        <svg class="w-4 h-4 transition-transform duration-200 transform caret-icon {% if request.resolver_match.app_name == 'grading' %}rotate-180{% endif %}" fill="none"
                             stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
                             </path>
                         </svg>
                     </button>
                     <div
-                        class="sidebar-dropdown-menu space-y-1 mt-1 hidden max-h-0 overflow-hidden transition-all duration-300">
+                        class="sidebar-dropdown-menu space-y-1 mt-1 overflow-hidden transition-all duration-300 {% if request.resolver_match.app_name == 'grading' %}max-h-[500px]{% else %}max-h-0 hidden{% endif %} border-l-2 border-indigo-500/30 ml-4">
                         <a href="{% url 'grading:mark_list' %}"
-                            class="nav-link pl-8 text-sm py-2 shadow-none hover:bg-slate-50/50"
+                            class="nav-link pl-8 text-sm py-2 shadow-none hover:bg-white/5 {% if request.resolver_match.app_name == 'grading' and request.resolver_match.url_name == 'mark_list' %}bg-indigo-500/20 text-indigo-300 font-bold{% else %}text-slate-300{% endif %}"
                             style="text-decoration:none;">
                             <svg class="w-4 h-4 mr-3 flex-shrink-0" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
@@ -371,7 +384,7 @@
                             Term Marks
                         </a>
                         <a href="{% url 'grading:report_list' %}"
-                            class="nav-link pl-8 text-sm py-2 shadow-none hover:bg-slate-50/50"
+                            class="nav-link pl-8 text-sm py-2 shadow-none hover:bg-white/5 {% if request.resolver_match.app_name == 'grading' and request.resolver_match.url_name == 'report_list' %}bg-indigo-500/20 text-indigo-300 font-bold{% else %}text-slate-300{% endif %}"
                             style="text-decoration:none;">
                             <svg class="w-4 h-4 mr-3 flex-shrink-0" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
@@ -385,20 +398,20 @@
                 </div>
 
                 <!-- Certificates Dropdown -->
-                <div class="sidebar-dropdown pt-2">
+                <div class="sidebar-dropdown pt-2 {% if request.resolver_match.app_name == 'certificates' %}active{% endif %}">
                     <button type="button"
-                        class="sidebar-dropdown-toggle w-full flex items-center justify-between px-4 py-2 text-slate-500 hover:text-indigo-600 transition-colors focus:outline-none">
+                        class="sidebar-dropdown-toggle w-full flex items-center justify-between px-4 py-2 text-slate-400 hover:text-indigo-400 transition-colors focus:outline-none {% if request.resolver_match.app_name == 'certificates' %}text-indigo-400{% endif %}">
                         <span class="text-xs font-bold uppercase tracking-widest">Diplomas</span>
-                        <svg class="w-4 h-4 transition-transform duration-200 transform caret-icon" fill="none"
+                        <svg class="w-4 h-4 transition-transform duration-200 transform caret-icon {% if request.resolver_match.app_name == 'certificates' %}rotate-180{% endif %}" fill="none"
                             stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
                             </path>
                         </svg>
                     </button>
                     <div
-                        class="sidebar-dropdown-menu space-y-1 mt-1 hidden max-h-0 overflow-hidden transition-all duration-300">
+                        class="sidebar-dropdown-menu space-y-1 mt-1 overflow-hidden transition-all duration-300 {% if request.resolver_match.app_name == 'certificates' %}max-h-[500px]{% else %}max-h-0 hidden{% endif %} border-l-2 border-indigo-500/30 ml-4">
                         <a href="{% url 'certificates:certificate_list' %}"
-                            class="nav-link pl-8 text-sm py-2 shadow-none hover:bg-slate-50/50"
+                            class="nav-link pl-8 text-sm py-2 shadow-none hover:bg-white/5 {% if request.resolver_match.app_name == 'certificates' and request.resolver_match.url_name == 'certificate_list' %}bg-indigo-500/20 text-indigo-300 font-bold{% else %}text-slate-300{% endif %}"
                             style="text-decoration:none;">
                             <svg class="w-4 h-4 mr-3 flex-shrink-0" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
@@ -412,10 +425,11 @@
                 </div>
                 {% endif %}
             </nav>
+            </div>
         </div>
 
-        <div class="space-y-4 mt-auto pt-6">
-            <a href="{% url 'accounts:password_change' %}" class="nav-link text-sm" style="text-decoration:none;">
+        <div class="space-y-4 mt-auto pt-6 border-t border-slate-800 px-6 pb-6">
+            <a href="{% url 'accounts:password_change' %}" class="nav-link text-sm {% if request.resolver_match.app_name == 'accounts' and request.resolver_match.url_name == 'password_change' %}bg-indigo-500/20 text-indigo-300 font-bold{% else %}text-slate-300{% endif %}" style="text-decoration:none;">
                 <svg class="w-5 h-5 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
@@ -424,7 +438,7 @@
                 Profile Settings
             </a>
             {% if user.role == 'ADMIN' %}
-            <a href="{% url 'core:school_settings' %}" class="nav-link text-sm" style="text-decoration:none;">
+            <a href="{% url 'core:school_settings' %}" class="nav-link text-sm {% if request.resolver_match.app_name == 'core' and request.resolver_match.url_name == 'school_settings' %}bg-indigo-500/20 text-indigo-300 font-bold{% else %}text-slate-300{% endif %}" style="text-decoration:none;">
                 <svg class="w-5 h-5 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
@@ -433,7 +447,7 @@
                 School Identity
             </a>
             {% endif %}
-            <div class="glass-panel p-4 rounded-2xl flex items-center justify-between">
+            <div class="bg-slate-800/50 border border-slate-700/50 p-4 rounded-2xl flex items-center justify-between">
                 <div class="flex items-center gap-3">
                     {% if user.profile_picture %}
                     <img src="{{ user.profile_picture.url }}" class="w-10 h-10 rounded-xl object-cover shadow-sm">
@@ -443,12 +457,12 @@
                         {{ user.first_name|first|default:user.username|first|upper }}</div>
                     {% endif %}
                     <div>
-                        <div class="text-sm font-bold text-slate-800">{{ user.username }}</div>
-                        <div class="text-xs text-slate-500 font-medium">{{ user.role }}</div>
+                        <div class="text-sm font-bold text-white">{{ user.username }}</div>
+                        <div class="text-xs text-slate-400 font-medium">{{ user.role }}</div>
                     </div>
                 </div>
                 <a href="{% url 'accounts:logout' %}"
-                    class="bg-rose-100/50 hover:bg-rose-200 text-rose-600 p-2.5 rounded-xl transition-all shadow-sm">
+                    class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 p-2.5 rounded-xl transition-all shadow-sm">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
@@ -560,7 +574,8 @@
                     {% for error in field.errors %}
                     <li class="flex items-start"><span class="mr-2 text-rose-400 flex-shrink-0">&bull;</span>
                         <span><span class="font-bold border-b border-rose-200">{{ field.label }}</span>: {{ error
-                            }}</span></li>
+                            }}</span>
+                    </li>
                     {% endfor %}
                     {% endif %}
                     {% endfor %}
@@ -592,129 +607,15 @@
         </div>
         {% endfor %}
     </div>
-
-    <style>
-        @keyframes slideInRight {
-            from {
-                transform: translateX(120%);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        @keyframes fadeOutUp {
-            from {
-                transform: translateY(0) scale(1);
-                opacity: 1;
-            }
-
-            to {
-                transform: translateY(-20px) scale(0.9);
-                opacity: 0;
-            }
-        }
-
-        .toast-leaving {
-            animation: fadeOutUp 0.3s ease forwards !important;
-        }
-
-        .butterfly-particle {
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            background: linear-gradient(135deg, #8b5cf6, #ec4899);
-            border-radius: 50% 0 50% 0;
-            /* slight butterfly wing shape */
-            pointer-events: none;
-            z-index: 1000;
-        }
-
-        @keyframes flutterAway {
-            0% {
-                opacity: 1;
-                transform: translate(0, 0) scale(1) rotate(0deg);
-            }
-
-            100% {
-                opacity: 0;
-                transform: translate(var(--tx), var(--ty)) scale(0) rotate(var(--rot));
-            }
-        }
-    </style>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const toasts = document.querySelectorAll('.toast-item');
-
-            toasts.forEach(toast => {
-                let dismissTimeout;
-                let shattered = false;
-
-                const removeToast = () => {
-                    if (shattered) return;
-                    toast.classList.add('toast-leaving');
-                    setTimeout(() => toast.remove(), 300);
-                };
-
-                const shatterToast = (e) => {
-                    if (shattered) return;
-                    shattered = true;
-                    clearTimeout(dismissTimeout);
-
-                    const rect = toast.getBoundingClientRect();
-                    // Spawn particles
-                    for (let i = 0; i < 25; i++) {
-                        const p = document.createElement('div');
-                        p.className = 'butterfly-particle';
-
-                        // Start point near click
-                        const x = e.clientX - rect.left;
-                        const y = e.clientY - rect.top;
-                        p.style.left = x + 'px';
-                        p.style.top = y + 'px';
-
-                        // Trajectories spreading out and floating up
-                        const angle = Math.random() * Math.PI * 2;
-                        const velocity = 40 + Math.random() * 80;
-                        const tx = Math.cos(angle) * velocity;
-                        const ty = Math.sin(angle) * velocity - 40;
-                        const rot = (Math.random() - 0.5) * 500;
-
-                        p.style.setProperty('--tx', `${tx}px`);
-                        p.style.setProperty('--ty', `${ty}px`);
-                        p.style.setProperty('--rot', `${rot}deg`);
-
-                        p.style.animation = `flutterAway ${0.5 + Math.random() * 0.5}s cubic-bezier(0.25, 1, 0.5, 1) forwards`;
-                        toast.appendChild(p);
-                    }
-
-                    // Hide main content
-                    Array.from(toast.children).forEach(c => {
-                        if (!c.classList.contains('butterfly-particle')) c.style.opacity = '0';
-                    });
-                    toast.style.background = 'transparent';
-                    toast.style.boxShadow = 'none';
-                    toast.style.border = 'none';
-
-                    setTimeout(() => toast.remove(), 1000);
-                };
-
-                // Click to shatter
-                toast.addEventListener('click', shatterToast);
-
-                // Auto dismiss
-                dismissTimeout = setTimeout(removeToast, 5000);
-            });
-        });
-    </script>
     {% endif %}
 
     <!-- External Custom JS -->
     <script src="{% static 'js/main.js' %}"></script>
+    <script src="{% static 'js/common.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+    <!-- Particle Network Background -->
+    <canvas id="particle-canvas" class="fixed inset-0 pointer-events-none z-[-1] opacity-80"></canvas>
+    <script src="{% static 'js/particles.js' %}"></script>
 </body>
 
 </html>

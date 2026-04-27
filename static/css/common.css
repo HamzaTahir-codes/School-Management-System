@@ -1,0 +1,74 @@
+/* static/css/common.css */
+
+/* Toast Animations */
+@keyframes slideInRight {
+    from {
+        transform: translateX(120%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOutUp {
+    from {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+    to {
+        transform: translateY(-20px) scale(0.9);
+        opacity: 0;
+    }
+}
+
+.toast-leaving {
+    animation: fadeOutUp 0.3s ease forwards !important;
+}
+
+.butterfly-particle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: linear-gradient(135deg, #8b5cf6, #ec4899);
+    border-radius: 50% 0 50% 0;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+@keyframes flutterAway {
+    0% {
+        opacity: 1;
+        transform: translate(0, 0) scale(1) rotate(0deg);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(var(--tx), var(--ty)) scale(0) rotate(var(--rot));
+    }
+}
+
+/* Generic Form Input Styling (from generic_form.html) */
+.generic-form-input input:not([type="checkbox"]), 
+.generic-form-input select, 
+.generic-form-input textarea {
+    width: 100%;
+    padding: 1rem 1.25rem;
+    background: rgba(255, 255, 255, 0.5);
+    border: 2px solid rgba(226, 232, 240, 0.8);
+    border-radius: 1rem;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    color: #1e293b;
+}
+
+.generic-form-input input:focus, 
+.generic-form-input select:focus, 
+.generic-form-input textarea:focus {
+    background: white;
+    border-color: #6366f1;
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1), 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    transform: translateY(-1px);
+}
