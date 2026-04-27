@@ -1,8 +1,20 @@
 {% extends "base.html" %}
-
+{% load static %}
 {% block title %}Timetable Builder - SchoolOS{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/timetable/builder.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/timetable/builder.js' %}"></script>
+{% endblock %}
+
 {% block content %}
+<div id="timetable-config" 
+     data-assign-url="{% url 'timetable:assign_period' %}"
+     data-remove-url="{% url 'timetable:remove_period' entry_pk=0 %}">
+</div>
 <div class="max-w-full mx-auto w-full px-4 pt-16 sm:pt-24 pb-20">
     
     <!-- Unified Header & Filter Panel -->
@@ -235,81 +247,4 @@
     </div>
 </div>
 
-<script>
-const modal = document.getElementById('assignModal');
-const form = document.getElementById('assignForm');
-
-function openAssignModal(slotId, day, isEdit = false) {
-    document.getElementById('modal_timeslot_id').value = slotId;
-    document.getElementById('modal_day').value = day;
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
-}
-
-function closeAssignModal() {
-    modal.classList.add('hidden');
-    modal.classList.remove('flex');
-    form.reset();
-}
-
-form.onsubmit = function(e) {
-    e.preventDefault();
-    const formData = new FormData(form);
-    const btn = document.getElementById('assignBtnText');
-    btn.innerHTML = 'Syncing...';
-
-    fetch("{% url 'timetable:assign_period' %}", {
-        method: "POST",
-        headers: {
-            "X-CSRFToken": "{{ csrf_token }}",
-        },
-        body: formData
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            window.location.reload();
-        } else {
-            alert("Error: " + data.error);
-            btn.innerHTML = 'Lock Assignment';
-        }
-    });
-};
-
-function removeEntry(pk) {
-    if (confirm("Permanently remove this session from the schedule?")) {
-        const url = "{% url 'timetable:remove_period' entry_pk=0 %}".replace('0', pk);
-        fetch(url, {
-            method: "POST",
-            headers: {
-                "X-CSRFToken": "{{ csrf_token }}",
-            }
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                window.location.reload();
-            } else {
-                alert("Error: " + data.error);
-            }
-        });
-    }
-}
-</script>
-
-<style>
-    .timetable-card {
-        transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .timetable-card:active {
-        transform: scale(0.96);
-    }
-    /* Simple sticky header styling */
-    thead th {
-        box-shadow: 0 1px 0 0 rgb(241 245 249);
-    }
-    select {
-        @apply transition-all duration-300;
-    }
-</style>
 {% endblock %}

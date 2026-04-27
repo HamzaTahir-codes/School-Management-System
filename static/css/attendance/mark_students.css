@@ -1,0 +1,9 @@
+/* static/css/attendance/mark_students.css */
+
+.student-card {
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.status-btn {
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}

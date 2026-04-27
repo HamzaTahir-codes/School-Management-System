@@ -1,0 +1,18 @@
+/* static/css/timetable/builder.css */
+
+.timetable-card {
+    transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.timetable-card:active {
+    transform: scale(0.96);
+}
+
+/* Simple sticky header styling */
+thead th {
+    box-shadow: 0 1px 0 0 rgb(241 245 249);
+}
+
+select {
+    transition: all 0.3s ease;
+}
