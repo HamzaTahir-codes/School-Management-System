@@ -147,10 +147,18 @@ class SectionDeleteView(LoginRequiredMixin, AdminRequiredMixin, DeleteView):
 
 # ===================== SUBJECTS =====================
 class SubjectListView(LoginRequiredMixin, AdminRequiredMixin, ListView):
-    model = Subject
+    model = ClassLevel
     template_name = 'academics/subject_list.html'
-    context_object_name = 'subjects'
-    paginate_by = 10
+    context_object_name = 'classes'
+
+    def get_queryset(self):
+        return ClassLevel.objects.prefetch_related('subjects').all()
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['title'] = 'Subjects by Class'
+        ctx['all_subjects'] = Subject.objects.all()
+        return ctx
 
 class SubjectCreateView(LoginRequiredMixin, AdminRequiredMixin, CreateView):
     model = Subject

@@ -1,0 +1,1 @@
+# Academics commands package

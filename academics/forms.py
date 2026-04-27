@@ -23,7 +23,10 @@ class SectionForm(forms.ModelForm):
 class SubjectForm(forms.ModelForm):
     class Meta:
         model = Subject
-        fields = ['name', 'code', 'class_level']
+        fields = ['name', 'code', 'class_levels']
+        widgets = {
+            'class_levels': forms.CheckboxSelectMultiple(),
+        }
 
 class TeacherAssignmentForm(forms.ModelForm):
     class Meta:

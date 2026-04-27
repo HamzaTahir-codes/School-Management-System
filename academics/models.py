@@ -42,7 +42,7 @@ class Section(models.Model):
 class Subject(models.Model):
     name = models.CharField(max_length=100)
     code = models.CharField(max_length=20)
-    class_level = models.ForeignKey(ClassLevel, on_delete=models.CASCADE, related_name='subjects')
+    class_levels = models.ManyToManyField(ClassLevel, related_name='subjects')
 
     def __str__(self):
         return f"{self.name} ({self.code})"
