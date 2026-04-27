@@ -1,5 +1,10 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}{{ school.name }} - Welcome{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/core/landing.css' %}">
+{% endblock %}
 
 {% block header %}
 <!-- Empty header block so base.html guest header doesn't render here -->
@@ -12,19 +17,7 @@
 {% block guest_main_classes %}w-full{% endblock %}
 
 {% block content %}
-<!-- Beautiful Animations & Styles -->
-<style>
-    @keyframes fade-in-up {
-        0% { opacity: 0; transform: translateY(20px); }
-        100% { opacity: 1; transform: translateY(0); }
-    }
-    .stagger-1 { animation: fade-in-up 0.6s ease-out 0.1s both; }
-    .stagger-2 { animation: fade-in-up 0.6s ease-out 0.3s both; }
-    .stagger-3 { animation: fade-in-up 0.6s ease-out 0.5s both; }
-    .stagger-4 { animation: fade-in-up 0.6s ease-out 0.7s both; }
-    
-    .feature-card:hover { transform: translateY(-5px); }
-</style>
+
 
 <!-- Navbar -->
 <nav class="w-full absolute top-0 left-0 p-6 flex justify-between items-center z-50 max-w-7xl mx-auto right-0">
