@@ -1,0 +1,29 @@
+{% load form_tags %}
+
+<div class="form-group {% if field.errors %}has-error{% endif %} {% if field|is_textarea %}md:col-span-2{% endif %}">
+    {% if field|is_checkbox %}
+        <label class="premium-checkbox-group">
+            {{ field|add_class:"premium-checkbox" }}
+            <span class="text-sm font-semibold text-slate-700">{{ field.label }}</span>
+        </label>
+    {% else %}
+        <label for="{{ field.id_for_label }}" class="premium-label">
+            {{ field.label }}
+            {% if field.field.required %}<span class="text-rose-500 ml-1">*</span>{% endif %}
+        </label>
+        
+        {{ field|add_class:"premium-input" }}
+    {% endif %}
+
+    {% if field.help_text %}
+        <small class="premium-help-text">{{ field.help_text|safe }}</small>
+    {% endif %}
+
+    {% if field.errors %}
+        {% for error in field.errors %}
+            <div class="premium-field-error">
+                <span class="mr-1">&times;</span> {{ error }}
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>

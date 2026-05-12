@@ -12,7 +12,7 @@
         
         <form method="post" class="space-y-4">
             {% csrf_token %}
-            {{ form.as_p }}
+            {% include 'includes/form_renderer.html' %}
             
             <div class="pt-4">
                 <button type="submit" class="w-full py-3 px-4 glass-btn-primary rounded-xl font-semibold shadow-lg transition-transform focus:outline-none focus:ring-4 focus:ring-indigo-500/30">

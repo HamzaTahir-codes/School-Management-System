@@ -3,7 +3,7 @@
 {% block title %}{{ title }} - SchoolOS{% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto">
+<div class="max-w-5xl mx-auto">
     <div class="flex items-center justify-between mb-8">
         <h1 class="text-3xl font-extrabold text-slate-800">{{ title }}</h1>
         {% if back_url %}
@@ -19,7 +19,7 @@
         
         <form method="post" class="space-y-4 relative z-10">
             {% csrf_token %}
-            {{ form.as_p }}
+            {% include 'includes/form_renderer.html' %}
             
             <div class="pt-6 mt-6 border-t border-slate-200/50">
                 <button type="submit" class="w-full glass-btn-primary py-3.5 rounded-xl font-bold text-lg shadow-lg shadow-indigo-500/20">
